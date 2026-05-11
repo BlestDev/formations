@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mes Formations</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#0f172a;
+    color:white;
+    font-family:Arial, sans-serif;
+    padding:30px;
+}
+
+h1{
+    margin-bottom:30px;
+    font-size:32px;
+}
+
+.folder{
+    background:#1e293b;
+    border-radius:16px;
+    margin-bottom:20px;
+    overflow:hidden;
+}
+
+.folder-title{
+    background:#334155;
+    padding:18px;
+    cursor:pointer;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.files{
+    display:none;
+    padding:15px;
+}
+
+.files.show{
+    display:block;
+}
+
+.file{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#0f172a;
+    margin-bottom:12px;
+    padding:14px;
+    border-radius:10px;
+    transition:0.2s;
+}
+
+.file:hover{
+    background:#2563eb;
+}
+
+.file a{
+    color:white;
+    text-decoration:none;
+    width:100%;
+}
+
+.loading{
+    opacity:0.7;
+}
+
+.badge{
+    background:#2563eb;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:12px;
+}
+
+</style>
+</head>
+<body>
+
+<h1>📚 Mes Formations</h1>
+
+<div id="content"></div>
+
+<script>
+
+const username = "BlestDev";
+const repo = "formations";
+
+const folders = [
+    "Vue"
+];
+
+const content = document.getElementById("content");
+
+async function loadFolder(folder){
+
+    const folderDiv = document.createElement("div");
+    folderDiv.className = "folder";
+
+    const title = document.createElement("div");
+    title.className = "folder-title";
+    title.innerHTML = `📁 ${folder}`;
+
+    const filesDiv = document.createElement("div");
+    filesDiv.className = "files";
+
+    filesDiv.innerHTML = `
+        <div class="loading">
+            Chargement...
+        </div>
+    `;
+
+    title.onclick = () => {
+        filesDiv.classList.toggle("show");
+    };
+
+    folderDiv.appendChild(title);
+    folderDiv.appendChild(filesDiv);
+
+    content.appendChild(folderDiv);
+
+    try{
+
+        const url =
+        `https://api.github.com/repos/${username}/${repo}/contents/${folder}`;
+
+        const response = await fetch(url);
+
+        const data = await response.json();
+
+        filesDiv.innerHTML = "";
+
+        /*
+        fichiers html uniquement
+        */
+
+        const htmlFiles = data.filter(file =>
+            file.type === "file" &&
+            file.name.endsWith(".html")
+        );
+
+        if(htmlFiles.length === 0){
+
+            filesDiv.innerHTML = `
+                <div class="loading">
+                    Aucun fichier HTML
+                </div>
+            `;
+
+            return;
+        }
+
+        htmlFiles.forEach(file => {
+
+            const div = document.createElement("div");
+            div.className = "file";
+
+            /*
+            URL GitHub Pages
+            */
+
+            const pageUrl =
+            `https://${username}.github.io/${repo}/${folder}/${file.name}`;
+
+            div.innerHTML = `
+                <a href="${pageUrl}" target="_blank">
+                    📄 ${file.name.replace(".html","")}
+                </a>
+
+                <span class="badge">
+                    HTML
+                </span>
+            `;
+
+            filesDiv.appendChild(div);
+
+        });
+
+    }catch(error){
+
+        filesDiv.innerHTML = `
+            <div class="loading">
+                Erreur de chargement
+            </div>
+        `;
+
+        console.error(error);
+
+    }
+
+}
+
+folders.forEach(loadFolder);
+
+</script>
+
+</body>
+</html>
