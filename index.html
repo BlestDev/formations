@@ -3,92 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Mes Formations</title>
+<title>LMS Pro</title>
 
 <style>
 
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial;
 }
 
 body{
-    background:#0f172a;
-    color:white;
-    font-family:Arial, sans-serif;
-    padding:30px;
+  display:flex;
+  height:100vh;
+  background:#0b1220;
+  color:white;
 }
 
-h1{
-    margin-bottom:30px;
-    font-size:32px;
+/* SIDEBAR */
+.sidebar{
+  width:300px;
+  background:#111827;
+  padding:15px;
+  overflow-y:auto;
+  border-right:1px solid #1f2937;
+}
+
+.logo{
+  font-size:20px;
+  font-weight:bold;
+  margin-bottom:15px;
 }
 
 .folder{
-    background:#1e293b;
-    border-radius:16px;
-    margin-bottom:20px;
-    overflow:hidden;
+  margin-bottom:10px;
 }
 
 .folder-title{
-    background:#334155;
-    padding:18px;
-    cursor:pointer;
-    font-size:20px;
-    font-weight:bold;
+  background:#1f2937;
+  padding:10px;
+  border-radius:8px;
+  cursor:pointer;
 }
 
-.files{
-    display:none;
-    padding:15px;
+.folder-title:hover{
+  background:#2563eb;
 }
 
-.files.show{
-    display:block;
+.submenu{
+  display:none;
+  padding-left:10px;
+  margin-top:5px;
 }
 
-.file{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:#0f172a;
-    margin-bottom:12px;
-    padding:14px;
-    border-radius:10px;
-    transition:0.2s;
+.submenu.active{
+  display:block;
 }
 
-.file:hover{
-    background:#2563eb;
+.course{
+  background:#0f172a;
+  padding:8px;
+  margin:5px 0;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:14px;
 }
 
-.file a{
-    color:white;
-    text-decoration:none;
-    width:100%;
+.course:hover{
+  background:#2563eb;
 }
 
-.loading{
-    opacity:0.7;
+/* CONTENT */
+.content{
+  flex:1;
+  padding:20px;
+  overflow-y:auto;
 }
 
-.badge{
-    background:#2563eb;
-    padding:4px 10px;
-    border-radius:20px;
-    font-size:12px;
+/* ARTICLE STYLE */
+.article{
+  background:white;
+  color:#111;
+  padding:30px;
+  border-radius:12px;
+  min-height:100%;
+  line-height:1.7;
+}
+
+/* TOP BAR */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:15px;
+}
+
+.btn{
+  background:#2563eb;
+  padding:6px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:13px;
+}
+
+.btn:hover{
+  background:#1d4ed8;
+}
+
+/* PROGRESS */
+.progress{
+  font-size:12px;
+  opacity:0.7;
+  margin-top:5px;
 }
 
 </style>
 </head>
+
 <body>
 
-<h1>📚 Mes Formations</h1>
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">🎓 LMS Pro</div>
+  <div id="sidebar"></div>
+</div>
 
-<div id="content"></div>
+<!-- CONTENT -->
+<div class="content">
+
+  <div class="topbar">
+    <div class="btn" onclick="goHome()">🏠 Accueil</div>
+    <div class="btn" onclick="toggleFav()">⭐ Favoris</div>
+  </div>
+
+  <div id="article" class="article">
+    📘 Sélectionne un cours
+  </div>
+
+</div>
 
 <script>
 
@@ -96,112 +148,167 @@ const username = "BlestDev";
 const repo = "formations";
 
 const folders = [
-    "Vue",
-	"Flutter",
-	"React"
+  "Vue",
+  "react",
+  "nodejs",
+  "windev"
 ];
 
-const content = document.getElementById("content");
+const sidebar = document.getElementById("sidebar");
+const article = document.getElementById("article");
 
-async function loadFolder(folder){
+let currentCourse = null;
+
+/* FAVORIS */
+let favorites = JSON.parse(localStorage.getItem("fav") || "[]");
+
+/* LOAD SIDEBAR */
+async function loadSidebar(){
+
+  for(const folder of folders){
 
     const folderDiv = document.createElement("div");
     folderDiv.className = "folder";
 
     const title = document.createElement("div");
     title.className = "folder-title";
-    title.innerHTML = `📁 ${folder}`;
+    title.innerText = "📁 " + folder;
 
-    const filesDiv = document.createElement("div");
-    filesDiv.className = "files";
-
-    filesDiv.innerHTML = `
-        <div class="loading">
-            Chargement...
-        </div>
-    `;
-
-    title.onclick = () => {
-        filesDiv.classList.toggle("show");
-    };
+    const submenu = document.createElement("div");
+    submenu.className = "submenu";
 
     folderDiv.appendChild(title);
-    folderDiv.appendChild(filesDiv);
+    folderDiv.appendChild(submenu);
+    sidebar.appendChild(folderDiv);
 
-    content.appendChild(folderDiv);
+    title.onclick = () => {
+      submenu.classList.toggle("active");
+    };
 
     try{
 
-        const url =
-        `https://api.github.com/repos/${username}/${repo}/contents/${folder}`;
+      const url =
+      `https://api.github.com/repos/${username}/${repo}/contents/${folder}`;
 
-        const response = await fetch(url);
+      const res = await fetch(url);
 
-        const data = await response.json();
+      if(!res.ok){
+        submenu.innerHTML = "<div class='course'>❌ Dossier introuvable</div>";
+        continue;
+      }
 
-        filesDiv.innerHTML = "";
+      const data = await res.json();
 
-        /*
-        fichiers html uniquement
-        */
+      if(!Array.isArray(data)){
+        submenu.innerHTML = "<div class='course'>❌ Format invalide</div>";
+        continue;
+      }
 
-        const htmlFiles = data.filter(file =>
-            file.type === "file" &&
-            file.name.endsWith(".html")
-        );
+      const htmlFiles = data.filter(f =>
+        f.type === "file" &&
+        f.name &&
+        f.name.endsWith(".html")
+      );
 
-        if(htmlFiles.length === 0){
+      if(htmlFiles.length === 0){
+        submenu.innerHTML = "<div class='course'>📭 Aucun cours</div>";
+        continue;
+      }
 
-            filesDiv.innerHTML = `
-                <div class="loading">
-                    Aucun fichier HTML
-                </div>
-            `;
+      htmlFiles.forEach(file => {
 
-            return;
-        }
+        const div = document.createElement("div");
+        div.className = "course";
 
-        htmlFiles.forEach(file => {
-
-            const div = document.createElement("div");
-            div.className = "file";
-
-            /*
-            URL GitHub Pages
-            */
-
-            const pageUrl =
-            `https://${username}.github.io/${repo}/${folder}/${file.name}`;
-
-            div.innerHTML = `
-                <a href="${pageUrl}" target="_blank">
-                    📄 ${file.name.replace(".html","")}
-                </a>
-
-                <span class="badge">
-                    HTML
-                </span>
-            `;
-
-            filesDiv.appendChild(div);
-
-        });
-
-    }catch(error){
-
-        filesDiv.innerHTML = `
-            <div class="loading">
-                Erreur de chargement
-            </div>
+        div.innerHTML = `
+          📘 ${file.name.replace(".html","")}
+          <div class="progress">Progression: 0%</div>
         `;
 
-        console.error(error);
+        div.onclick = () => loadCourse(folder, file.name);
+
+        submenu.appendChild(div);
+
+      });
+
+    }catch(err){
+
+      console.error(err);
+
+      submenu.innerHTML =
+      "<div class='course'>⚠️ Erreur chargement API</div>";
 
     }
 
+  }
+
 }
 
-folders.forEach(loadFolder);
+/* LOAD COURSE */
+async function loadCourse(folder, file){
+
+  currentCourse = file;
+
+  const url =
+  `https://${username}.github.io/${repo}/${folder}/${file}`;
+
+  article.innerHTML = "Chargement...";
+
+  const res = await fetch(url);
+  const html = await res.text();
+
+  const doc = new DOMParser().parseFromString(html,"text/html");
+
+  article.innerHTML = doc.body.innerHTML;
+
+  markProgress(file);
+
+}
+
+/* HOME */
+function goHome(){
+  article.innerHTML = "📘 Sélectionne un cours";
+}
+
+/* FAVORITES */
+function toggleFav(){
+
+  if(!currentCourse) return;
+
+  if(favorites.includes(currentCourse)){
+    favorites = favorites.filter(f => f !== currentCourse);
+  }else{
+    favorites.push(currentCourse);
+  }
+
+  localStorage.setItem("fav", JSON.stringify(favorites));
+
+  alert("Favoris mis à jour");
+
+}
+
+/* PROGRESS SYSTEM */
+function markProgress(file){
+
+  localStorage.setItem("progress-"+file, "100");
+  updateProgress(file);
+
+}
+
+function updateProgress(file){
+
+  const p = document.getElementById("p-"+file);
+  if(!p) return;
+
+  const value =
+  localStorage.getItem("progress-"+file) || "0";
+
+  p.innerText = "Progression: " + value + "%";
+
+}
+
+/* INIT */
+loadSidebar();
 
 </script>
 

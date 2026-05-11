@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 1 — Fondations · 14 Jours Dev</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #181818;
+    --surface2: #222222;
+    --border: #2e2e2e;
+    --accent: #c8f060;
+    --accent2: #60c8f0;
+    --accent3: #f060a8;
+    --text: #e8e4da;
+    --muted: #7a7570;
+    --code-bg: #1a1f14;
+    --tag-green: #1e3a0a;
+    --tag-green-t: #a8e063;
+    --tag-blue: #0a2a3a;
+    --tag-blue-t: #63c8e0;
+    --tag-red: #3a0a1e;
+    --tag-red-t: #e063a8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* Layout */
+  .layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 2rem 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar-logo {
+    padding: 0 1.5rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+  .sidebar-logo .phase {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .sidebar-logo .title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1.2;
+  }
+  .sidebar-logo .sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .nav-section {
+    padding: 0 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .nav-day-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.5rem 0.5rem 0.25rem;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--muted);
+    transition: all 0.15s;
+    text-decoration: none;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: #1e2d0a; color: var(--accent); }
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+  .nav-item.active .nav-dot { background: var(--accent); }
+  .nav-item.done .nav-dot { background: #4a7a20; }
+  .nav-item.done { color: #5a8a30; }
+
+  /* Main */
+  .main { padding: 3rem 4rem; max-width: 860px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* Day header */
+  .day-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .day-num-big {
+    font-family: 'Fraunces', serif;
+    font-size: 72px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--border);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 90px;
+    text-align: center;
+  }
+  .day-info { flex: 1; }
+  .day-tag-row { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-weight: 500;
+  }
+  .tag-green { background: var(--tag-green); color: var(--tag-green-t); }
+  .tag-blue { background: var(--tag-blue); color: var(--tag-blue-t); }
+  .tag-red { background: var(--tag-red); color: var(--tag-red-t); }
+  .day-title-main {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .day-subtitle { color: var(--muted); font-size: 14px; }
+  .time-bar {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .time-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+  }
+  .time-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* Content blocks */
+  .block { margin-bottom: 2.5rem; }
+  .block-title {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .block-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .block h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  .block h3:first-child { margin-top: 0; }
+  .block p { color: #b0aa9f; margin-bottom: 0.75rem; font-size: 14px; }
+  .block ul, .block ol { padding-left: 1.25rem; color: #b0aa9f; font-size: 14px; }
+  .block li { margin-bottom: 5px; }
+
+  /* Code block */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid #2a3520;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+  }
+  .code-block .filename {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    font-family: 'DM Mono', monospace;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+  pre {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #c8e090;
+    white-space: pre;
+  }
+  .cm { color: var(--muted); font-style: italic; }
+  .ck { color: #f080c0; }
+  .cs { color: #80d0f0; }
+  .cn { color: #f0c060; }
+  .co { color: var(--accent); }
+  .cf { color: #c080f0; }
+
+  /* Exercise box */
+  .exercise {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .exercise .ex-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0.75rem;
+  }
+  .ex-badge {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: #1e3a0a;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  .ex-title {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .ex-time { font-size: 12px; color: var(--muted); margin-left: auto; }
+  .exercise p, .exercise li { font-size: 13px; color: #a0a09a; }
+  .exercise ul { padding-left: 1.25rem; }
+  .exercise li { margin-bottom: 4px; }
+  .ex-checklist { list-style: none; padding: 0; margin-top: 10px; }
+  .ex-checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 13px;
+    color: #a0a09a;
+  }
+  .ex-checklist li::before {
+    content: '○';
+    color: var(--border);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Tip / info box */
+  .tip {
+    background: #0a1e2a;
+    border: 1px solid #1a4060;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-size: 13px;
+    color: var(--tag-blue-t);
+  }
+  .tip strong { color: var(--accent2); display: block; margin-bottom: 4px; font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  .warn {
+    background: #2a1a0a;
+    border: 1px solid #604020;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-size: 13px;
+    color: #d0a060;
+  }
+  .warn strong { color: #f0c060; display: block; margin-bottom: 4px; font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  /* Inline code */
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--surface2);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  /* Progress */
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* Nav footer */
+  .nav-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary {
+    background: var(--accent);
+    color: #0f0f0f;
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { background: #b0d840; color: #0f0f0f; border-color: #b0d840; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); }
+
+  .divider { height: 1px; background: var(--border); margin: 2rem 0; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { height: auto; position: static; }
+    .main { padding: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="phase">Formation · 14 jours</div>
+    <div class="title">Phase 1<br>Fondations</div>
+    <div class="sub">Jours 1 → 4</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-day-label">Jour 1</div>
+    <button class="nav-item active" onclick="goto('j1-env')"><span class="nav-dot"></span>L'environnement de dev</button>
+    <button class="nav-item" onclick="goto('j1-git')"><span class="nav-dot"></span>Git & GitHub</button>
+    <button class="nav-item" onclick="goto('j1-ex')"><span class="nav-dot"></span>Exercices J1</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-day-label">Jour 2</div>
+    <button class="nav-item" onclick="goto('j2-html')"><span class="nav-dot"></span>HTML5 sémantique</button>
+    <button class="nav-item" onclick="goto('j2-css')"><span class="nav-dot"></span>CSS moderne</button>
+    <button class="nav-item" onclick="goto('j2-ex')"><span class="nav-dot"></span>Exercices J2</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-day-label">Jour 3</div>
+    <button class="nav-item" onclick="goto('j3-js')"><span class="nav-dot"></span>JS ES6+ essentiel</button>
+    <button class="nav-item" onclick="goto('j3-async')"><span class="nav-dot"></span>Async & fetch()</button>
+    <button class="nav-item" onclick="goto('j3-ex')"><span class="nav-dot"></span>Exercices J3</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-day-label">Jour 4</div>
+    <button class="nav-item" onclick="goto('j4-projet')"><span class="nav-dot"></span>Mini-projet météo</button>
+    <button class="nav-item" onclick="goto('j4-deploy')"><span class="nav-dot"></span>Déploiement</button>
+    <button class="nav-item" onclick="goto('j4-bilan')"><span class="nav-dot"></span>Bilan & checklist</button>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:7%"></div></div>
+
+  <!-- ======================== J1 - ENV ======================== -->
+  <section class="section active" id="j1-env">
+    <div class="day-header">
+      <div class="day-num-big">1</div>
+      <div class="day-info">
+        <div class="day-tag-row">
+          <span class="tag tag-green">Théorie</span>
+          <span class="tag tag-blue">Installation</span>
+        </div>
+        <div class="day-title-main">L'environnement de développement</div>
+        <div class="day-subtitle">VS Code · Node.js · Terminal · Outils essentiels</div>
+        <div class="time-bar">
+          <div class="time-pill"><span class="time-dot" style="background:var(--accent2)"></span>2h théorie</div>
+          <div class="time-pill"><span class="time-dot" style="background:var(--accent)"></span>2h pratique</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Pourquoi cet environnement ?</div>
+      <p>Avant d'écrire une seule ligne de code, tu as besoin d'un atelier bien équipé. L'environnement de développement, c'est exactement ça : l'ensemble des outils qui te permettent d'écrire, tester, versionner et déployer ton code.</p>
+
+      <h3>1. VS Code — ton éditeur</h3>
+      <p>VS Code est l'éditeur de code le plus utilisé au monde. Il est gratuit, rapide, et s'étend via des extensions. Télécharge-le sur <strong>code.visualstudio.com</strong>.</p>
+      <p><strong>Extensions indispensables à installer tout de suite :</strong></p>
+      <ul>
+        <li><strong>Prettier</strong> — formate ton code automatiquement à la sauvegarde</li>
+        <li><strong>ESLint</strong> — détecte les erreurs JS avant d'exécuter le code</li>
+        <li><strong>GitLens</strong> — visualise l'historique Git dans l'éditeur</li>
+        <li><strong>Vue - Official</strong> (ou React Developer Tools pour React)</li>
+        <li><strong>Thunder Client</strong> — tester des API directement dans VS Code</li>
+      </ul>
+
+      <div class="tip">
+        <strong>Configuration Prettier</strong>
+        Crée un fichier <code>.prettierrc</code> à la racine de chaque projet avec : <code>{"semi": true, "singleQuote": true, "tabWidth": 2}</code>. Active "Format on Save" dans les paramètres VS Code (Ctrl+Shift+P → "Open Settings" → chercher "Format On Save").
+      </div>
+
+      <h3>2. Node.js — le moteur JavaScript</h3>
+      <p>Node.js permet d'exécuter du JavaScript en dehors du navigateur. Il inclut <strong>npm</strong> (gestionnaire de paquets). Télécharge la version LTS sur <strong>nodejs.org</strong>.</p>
+
+      <div class="code-block">
+        <div class="filename">Terminal — vérifier l'installation</div>
+        <pre><span class="cm"># Après installation, vérifier les versions</span>
+node --version    <span class="cm"># doit afficher v20.x.x ou supérieur</span>
+npm --version     <span class="cm"># doit afficher 10.x.x ou supérieur</span></pre>
+      </div>
+
+      <h3>3. Le terminal — ton outil de commande</h3>
+      <p>Le terminal (ou invite de commande) est l'interface texte pour piloter ton ordinateur. Sur Mac/Linux : Terminal. Sur Windows : utilise <strong>Git Bash</strong> (inclus avec Git) ou le terminal intégré de VS Code.</p>
+
+      <div class="code-block">
+        <div class="filename">Commandes essentielles à connaître</div>
+        <pre><span class="cm"># Navigation</span>
+<span class="co">pwd</span>               <span class="cm"># affiche le répertoire courant</span>
+<span class="co">ls</span>                <span class="cm"># liste les fichiers (dir sur Windows)</span>
+<span class="co">cd</span> nom-dossier    <span class="cm"># entrer dans un dossier</span>
+<span class="co">cd</span> ..             <span class="cm"># remonter d'un niveau</span>
+<span class="co">cd</span> ~              <span class="cm"># aller dans le dossier personnel</span>
+
+<span class="cm"># Fichiers & dossiers</span>
+<span class="co">mkdir</span> mon-projet  <span class="cm"># créer un dossier</span>
+<span class="co">touch</span> index.html  <span class="cm"># créer un fichier vide (Mac/Linux)</span>
+<span class="co">rm</span> fichier.txt    <span class="cm"># supprimer un fichier (⚠ sans corbeille)</span>
+<span class="co">cp</span> a.txt b.txt    <span class="cm"># copier</span>
+<span class="co">mv</span> a.txt dossier/ <span class="cm"># déplacer / renommer</span>
+
+<span class="cm"># Utile</span>
+<span class="co">clear</span>             <span class="cm"># vider le terminal</span>
+<span class="co">Ctrl+C</span>            <span class="cm"># arrêter un processus en cours</span></pre>
+      </div>
+
+      <div class="warn">
+        <strong>Piège courant</strong>
+        La commande <code>rm -rf</code> supprime définitivement des dossiers entiers sans confirmation. Ne l'utilise jamais sans être certain de ce que tu supprimes.
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="btn" disabled>← Précédent</button>
+      <button class="btn btn-primary" onclick="goto('j1-git')">Git & GitHub →</button>
+    </div>
+  </section>
+
+  <!-- ======================== J1 - GIT ======================== -->
+  <section class="section" id="j1-git">
+    <div class="day-header">
+      <div class="day-num-big">1</div>
+      <div class="day-info">
+        <div class="day-tag-row"><span class="tag tag-green">Théorie</span><span class="tag tag-blue">Outils</span></div>
+        <div class="day-title-main">Git & GitHub</div>
+        <div class="day-subtitle">Versionner son code · Travailler en sécurité</div>
+        <div class="time-bar">
+          <div class="time-pill"><span class="time-dot" style="background:var(--accent2)"></span>45 min théorie</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Comprendre Git</div>
+      <p>Git est un système de <strong>contrôle de version</strong>. Il enregistre chaque modification de ton code dans des "commits" — des snapshots. Si tu casses quelque chose, tu peux revenir en arrière. C'est indispensable, même seul.</p>
+      <p><strong>GitHub</strong> est une plateforme en ligne pour stocker tes dépôts Git. Crée un compte gratuit sur <strong>github.com</strong>.</p>
+
+      <h3>Les 4 commandes Git du quotidien</h3>
+
+      <div class="code-block">
+        <div class="filename">Workflow Git de base</div>
+        <pre><span class="cm"># 1. Initialiser un dépôt (une seule fois par projet)</span>
+<span class="co">git init</span>
+
+<span class="cm"># 2. Voir l'état de tes fichiers</span>
+<span class="co">git status</span>
+
+<span class="cm"># 3. Ajouter des fichiers à la "zone de staging"</span>
+<span class="co">git add</span> index.html    <span class="cm"># un seul fichier</span>
+<span class="co">git add</span> .             <span class="cm"># tous les fichiers modifiés</span>
+
+<span class="cm"># 4. Créer un commit (un snapshot)</span>
+<span class="co">git commit</span> -m <span class="cs">"feat: ajoute la page d'accueil"</span>
+
+<span class="cm"># 5. Envoyer sur GitHub</span>
+<span class="co">git push</span> origin main</pre>
+      </div>
+
+      <h3>Connecter un projet local à GitHub</h3>
+      <div class="code-block">
+        <div class="filename">Lier un repo local à GitHub</div>
+        <pre><span class="cm"># Sur GitHub : créer un nouveau repo (sans README)</span>
+<span class="cm"># Puis dans ton terminal :</span>
+
+<span class="co">git init</span>
+<span class="co">git add</span> .
+<span class="co">git commit</span> -m <span class="cs">"first commit"</span>
+<span class="co">git branch</span> -M main
+<span class="co">git remote add</span> origin https://github.com/TON-USER/TON-REPO.git
+<span class="co">git push</span> -u origin main</pre>
+      </div>
+
+      <h3>Convention de nommage des commits</h3>
+      <div class="code-block">
+        <div class="filename">Format recommandé (Conventional Commits)</div>
+        <pre><span class="cs">feat:</span> ajoute le formulaire de connexion
+<span class="cs">fix:</span> corrige l'affichage sur mobile
+<span class="cs">style:</span> reformate le CSS
+<span class="cs">docs:</span> met à jour le README
+<span class="cs">refactor:</span> simplifie la fonction de tri</pre>
+      </div>
+
+      <div class="tip">
+        <strong>Fichier .gitignore</strong>
+        Crée un fichier <code>.gitignore</code> pour exclure les fichiers inutiles. Au minimum : <code>node_modules/</code> et <code>.env</code>. GitHub propose des templates selon le projet.
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="btn" onclick="goto('j1-env')">← Environnement</button>
+      <button class="btn btn-primary" onclick="goto('j1-ex')">Exercices J1 →</button>
+    </div>
+  </section>
+
+  <!-- ======================== J1 - EXERCICES ======================== -->
+  <section class="section" id="j1-ex">
+    <div class="day-header">
+      <div class="day-num-big">1</div>
+      <div class="day-info">
+        <div class="day-tag-row"><span class="tag tag-red">Pratique</span></div>
+        <div class="day-title-main">Exercices — Jour 1</div>
+        <div class="day-subtitle">2h de pratique guidée</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Exercices du jour</div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">Exercice 1</span>
+          <span class="ex-title">Installation & vérification</span>
+          <span class="ex-time">20 min</span>
+        </div>
+        <p style="margin-bottom:10px">Installe et vérifie ton environnement complet.</p>
+        <ul class="ex-checklist">
+          <li>Télécharger et installer VS Code depuis code.visualstudio.com</li>
+          <li>Installer les 5 extensions listées dans le cours (Prettier, ESLint, GitLens, Vue Official, Thunder Client)</li>
+          <li>Télécharger et installer Node.js LTS depuis nodejs.org</li>
+          <li>Ouvrir le terminal et vérifier : <code>node --version</code> et <code>npm --version</code></li>
+          <li>Créer un fichier <code>.prettierrc</code> et activer "Format on Save"</li>
+        </ul>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">Exercice 2</span>
+          <span class="ex-title">Navigation terminal</span>
+          <span class="ex-time">20 min</span>
+        </div>
+        <p style="margin-bottom:10px">Sans utiliser l'explorateur de fichiers, uniquement le terminal :</p>
+        <ul class="ex-checklist">
+          <li>Naviguer vers ton bureau (Desktop)</li>
+          <li>Créer un dossier <code>formation-dev</code></li>
+          <li>À l'intérieur, créer un sous-dossier <code>jour-1</code></li>
+          <li>Dans <code>jour-1</code>, créer 3 fichiers : <code>index.html</code>, <code>style.css</code>, <code>notes.txt</code></li>
+          <li>Lister les fichiers avec <code>ls -la</code> pour voir les détails</li>
+          <li>Ouvrir le dossier dans VS Code : <code>code .</code></li>
+        </ul>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">Exercice 3</span>
+          <span class="ex-title">Premier dépôt GitHub</span>
+          <span class="ex-time">30 min</span>
+        </div>
+        <p style="margin-bottom:10px">Crée ton premier vrai projet versionné :</p>
+        <ul class="ex-checklist">
+          <li>Créer un compte GitHub si ce n'est pas fait</li>
+          <li>Sur GitHub, créer un nouveau dépôt nommé <code>formation-14-jours</code> (cocher "Add README")</li>
+          <li>Cloner le repo localement : <code>git clone https://github.com/TON-USER/formation-14-jours.git</code></li>
+          <li>Naviguer dans le dossier cloné</li>
+          <li>Créer un fichier <code>JOURNAL.md</code> et écrire : "Jour 1 : installation de l'environnement"</li>
+          <li>Faire <code>git add .</code> puis <code>git commit -m "docs: ajoute journal de formation"</code></li>
+          <li>Faire <code>git push</code> et vérifier sur GitHub que le fichier apparaît</li>
+        </ul>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">Exercice 4 — Bonus</span>
+          <span class="ex-title">Simuler un workflow Git</span>
+          <span class="ex-time">30 min</span>
+        </div>
+        <p style="margin-bottom:10px">Entraîne-toi à faire plusieurs commits avec des messages clairs :</p>
+        <ul class="ex-checklist">
+          <li>Dans <code>JOURNAL.md</code>, ajouter une ligne → commit avec <code>docs: ...</code></li>
+          <li>Créer un fichier <code>index.html</code> vide → commit avec <code>feat: ...</code></li>
+          <li>Ajouter <code>&lt;h1&gt;Bonjour&lt;/h1&gt;</code> dans le HTML → commit avec <code>feat: ...</code></li>
+          <li>Faire <code>git log --oneline</code> pour voir l'historique</li>
+          <li>Pousser tout sur GitHub avec <code>git push</code></li>
+        </ul>
+      </div>
+
+      <div class="tip">
+        <strong>Ressources complémentaires</strong>
+        <br>• learngitbranching.js.org — visualiser Git de façon interactive (20 min, très utile)
+        <br>• ohshitgit.com — comment récupérer les erreurs courantes
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="btn" onclick="goto('j1-git')">← Git</button>
+      <button class="btn btn-primary" onclick="goto('j2-html')">Jour 2 : HTML →</button>
+    </div>
+  </section>
+
+  <!-- ======================== J2 - HTML ======================== -->
+  <section class="section" id="j2-html">
+    <div class="day-header">
+      <div class="day-num-big">2</div>
+      <div class="day-info">
+        <div class="day-tag-row"><span class="tag tag-green">Théorie</span></div>
+        <div class="day-title-main">HTML5 sémantique</div>
+        <div class="day-subtitle">Structure · Balises sémantiques · Bonnes pratiques</div>
+        <div class="time-bar">
+          <div class="time-pill"><span class="time-dot" style="background:var(--accent2)"></span>1h30 théorie</div>
+          <div class="time-pill"><span class="time-dot" style="background:var(--accent)"></span>2h30 pratique</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">HTML sémantique</div>
+      <p>Le HTML sémantique utilise des balises qui <strong>décrivent le rôle du contenu</strong>, pas juste son apparence. Ça aide les moteurs de recherche, les lecteurs d'écran, et tes collègues.</p>
+
+      <h3>Structure d'une page HTML moderne</h3>
+      <div class="code-block">
+        <div class="filename">index.html — squelette complet</div>
+        <pre><span class="ck">&lt;!DOCTYPE html&gt;</span>
+<span class="ck">&lt;html</span> <span class="cn">lang</span>=<span class="cs">"fr"</span><span class="ck">&gt;</span>
+<span class="ck">&lt;head&gt;</span>
+  <span class="ck">&lt;meta</span> <span class="cn">charset</span>=<span class="cs">"UTF-8"</span><span class="ck">&gt;</span>
+  <span class="ck">&lt;meta</span> <span class="cn">name</span>=<span class="cs">"viewport"</span> <span class="cn">content</span>=<span class="cs">"width=device-width, initial-scale=1.0"</span><span class="ck">&gt;</span>
+  <span class="ck">&lt;title&gt;</span>Ma page<span class="ck">&lt;/title&gt;</span>
+  <span class="ck">&lt;link</span> <span class="cn">rel</span>=<span class="cs">"stylesheet"</span> <span class="cn">href</span>=<span class="cs">"style.css"</span><span class="ck">&gt;</span>
+<span class="ck">&lt;/head&gt;</span>
+<span class="ck">&lt;body&gt;</span>
+
+  <span class="ck">&lt;header&gt;</span>              <span class="cm">&lt;!-- en-tête du site --&gt;</span>
+    <span class="ck">&lt;nav&gt;</span>               <span class="cm">&lt;!-- navigation principale --&gt;</span>
+      <span class="ck">&lt;a</span> <span class="cn">href</span>=<span class="cs">"/"</span><span class="ck">&gt;</span>Accueil<span class="ck">&lt;/a&gt;</span>
+    <span class="ck">&lt;/nav&gt;</span>
+  <span class="ck">&lt;/header&gt;</span>
+
+  <span class="ck">&lt;main&gt;</span>                <span class="cm">&lt;!-- contenu principal (1 seul par page) --&gt;</span>
+    <span class="ck">&lt;article&gt;</span>           <span class="cm">&lt;!-- contenu autonome (article, carte) --&gt;</span>
+      <span class="ck">&lt;h1&gt;</span>Titre principal<span class="ck">&lt;/h1&gt;</span>
+      <span class="ck">&lt;p&gt;</span>Introduction...<span class="ck">&lt;/p&gt;</span>
+      <span class="ck">&lt;section&gt;</span>          <span class="cm">&lt;!-- section thématique --&gt;</span>
+        <span class="ck">&lt;h2&gt;</span>Sous-titre<span class="ck">&lt;/h2&gt;</span>
+      <span class="ck">&lt;/section&gt;</span>
+    <span class="ck">&lt;/article&gt;</span>
+
+    <span class="ck">&lt;aside&gt;</span>             <span class="cm">&lt;!-- contenu secondaire (sidebar) --&gt;</span>
+    <span class="ck">&lt;/aside&gt;</span>
+  <span class="ck">&lt;/main&gt;</span>
+
+  <span class="ck">&lt;footer&gt;</span>              <span class="cm">&lt;!-- pied de page --&gt;</span>
+    <span class="ck">&lt;p&gt;</span>&copy; 2025<span class="ck">&lt;/p&gt;</span>
+  <span class="ck">&lt;/footer&gt;</span>
+
+  <span class="ck">&lt;script</span> <span class="cn">src</span>=<span class="cs">"app.js"</span><span class="ck">&gt;&lt;/script&gt;</span>  <span class="cm">&lt;!-- JS à la fin du body --&gt;</span>
+<span class="ck">&lt;/body&gt;</span>
+<span class="ck">&lt;/html&gt;</span></pre>
+      </div>
+
+      <h3>Balises à connaître absolument</h3>
+      <div class="code-block">
+        <div class="filename">Balises courantes</div>
+        <pre><span class="cm">&lt;!-- Titres (hiérarchie h1 → h6, un seul h1 par page) --&gt;</span>
+<span class="ck">&lt;h1&gt;</span>Titre principal<span class="ck">&lt;/h1&gt;</span>
+<span class="ck">&lt;h2&gt;</span>Sous-titre<span class="ck">&lt;/h2&gt;</span>
+
+<span class="cm">&lt;!-- Listes --&gt;</span>
+<span class="ck">&lt;ul&gt;&lt;li&gt;</span>Non ordonnée<span class="ck">&lt;/li&gt;&lt;/ul&gt;</span>
+<span class="ck">&lt;ol&gt;&lt;li&gt;</span>Ordonnée<span class="ck">&lt;/li&gt;&lt;/ol&gt;</span>
+
+<span class="cm">&lt;!-- Image (toujours un alt !) --&gt;</span>
+<span class="ck">&lt;img</span> <span class="cn">src</span>=<span class="cs">"photo.jpg"</span> <span class="cn">alt</span>=<span class="cs">"Description de l'image"</span><span class="ck">&gt;</span>
+
+<span class="cm">&lt;!-- Formulaire --&gt;</span>
+<span class="ck">&lt;form&gt;</span>
+  <span class="ck">&lt;label</span> <span class="cn">for</span>=<span class="cs">"email"</span><span class="ck">&gt;</span>Email<span class="ck">&lt;/label&gt;</span>
+  <span class="ck">&lt;input</span> <span class="cn">type</span>=<span class="cs">"email"</span> <span class="cn">id</span>=<span class="cs">"email"</span> <span class="cn">name</span>=<span class="cs">"email"</span> <span class="cn">required</span><span class="ck">&gt;</span>
+  <span class="ck">&lt;button</span> <span class="cn">type</span>=<span class="cs">"submit"</span><span class="ck">&gt;</span>Envoyer<span class="ck">&lt;/button&gt;</span>
+<span class="ck">&lt;/form&gt;</span></pre>
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="btn" onclick="goto('j1-ex')">← Exercices J1</button>
+      <button class="btn btn-primary" onclick="goto('j2-css')">CSS moderne →</button>
+    </div>
+  </section>
+
+  <!-- ======================== J2 - CSS ======================== -->
+  <section class="section" id="j2-css">
+    <div class="day-header">
+      <div class="day-num-big">2</div>
+      <div class="day-info">
+        <div class="day-tag-row"><span class="tag tag-green">Théorie</span></div>
+        <div class="day-title-main">CSS moderne</div>
+        <div class="day-subtitle">Flexbox · Grid · Variables CSS · Responsive</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">CSS essentiel</div>
+
+      <h3>Variables CSS</h3>
+      <div class="code-block">
+        <div class="filename">style.css</div>
+        <pre><span class="cm">/* Définir des variables dans :root */</span>
+<span class="cn">:root</span> {
+  <span class="co">--couleur-primaire</span>: <span class="cs">#2563eb</span>;
+  <span class="co">--couleur-texte</span>: <span class="cs">#1f2937</span>;
+  <span class="co">--espacement-base</span>: <span class="cs">1rem</span>;
+  <span class="co">--rayon-bord</span>: <span class="cs">8px</span>;
+}
+
+<span class="cm">/* Utiliser les variables */</span>
+<span class="cn">.bouton</span> {
+  background-color: <span class="cf">var</span>(<span class="co">--couleur-primaire</span>);
+  padding: <span class="cf">var</span>(<span class="co">--espacement-base</span>);
+  border-radius: <span class="cf">var</span>(<span class="co">--rayon-bord</span>);
+}</pre>
+      </div>
+
+      <h3>Flexbox — aligner des éléments</h3>
+      <div class="code-block">
+        <div class="filename">Flexbox en pratique</div>
+        <pre><span class="cn">.conteneur</span> {
+  display: flex;
+  gap: 1rem;                  <span class="cm">/* espace entre les enfants */</span>
+  align-items: center;        <span class="cm">/* centrer verticalement */</span>
+  justify-content: space-between; <span class="cm">/* répartir horizontalement */</span>
+  flex-wrap: wrap;            <span class="cm">/* passer à la ligne si besoin */</span>
+}
+
+<span class="cm">/* Centrer absolument (horizontalement + verticalement) */</span>
+<span class="cn">.centrer</span> {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}</pre>
+      </div>
+
+      <div class="tip">
+        <strong>Apprendre Flexbox en jouant</strong>
+        Joue à <strong>flexboxfroggy.com</strong> — 24 niveaux interactifs qui couvrent toutes les propriétés Flexbox en ~30 minutes.
+      </div>
+
+      <h3>Grid — les mises en page avancées</h3>
+      <div class="code-block">
+        <div class="filename">CSS Grid en pratique</div>
+        <pre><span class="cm">/* Grille responsive automatique */</span>
+<span class="cn">.grille-cartes</span> {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+<span class="cm">/* Mise en page classique avec Grid */</span>
+<span class="cn">.layout</span> {
+  display: grid;
+  grid-template-columns: 250px 1fr;   <span class="cm">/* sidebar + contenu */</span>
+  grid-template-rows: 60px 1fr 40px;  <span class="cm">/* header + main + footer */</span>
+  min-height: 100vh;
+}</pre>
+      </div>
+
+      <div class="tip">
+        <strong>Apprendre Grid en jouant</strong>
+        Joue à <strong>cssgridgarden.com</strong> — 28 niveaux interactifs pour maîtriser CSS Grid.
+      </div>
+
+      <h3>Media queries — design responsive</h3>
+      <div class="code-block">
+        <div class="filename">Responsive design</div>
+        <pre><span class="cm">/* Mobile first : écrire les styles de base pour mobile */</span>
+<span class="cn">.grille</span> {
+  display: grid;
+  grid-template-columns: 1fr;  <span class="cm">/* 1 colonne sur mobile */</span>
+}
+
+<span class="cm">/* Puis ajouter les breakpoints pour tablette et desktop */</span>
+<span class="cn">@media (min-width: 768px)</span> {
+  <span class="cn">.grille</span> { grid-template-columns: repeat(2, 1fr); }
+}
+
+<span class="cn">@media (min-width: 1024px)</span> {
+  <span class="cn">.grille</span> { grid-template-columns: repeat(3, 1fr); }
+}</pre>
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="btn" onclick="goto('j2-html')">← HTML</button>
+      <button class="btn btn-primary" onclick="goto('j2-ex')">Exercices J2 →</button>
+    </div>
+  </section>
+
+  <!-- ======================== J2 - EXERCICES ======================== -->
+  <section class="section" id="j2-ex">
+    <div class="day-header">
+      <div class="day-num-big">2</div>
+      <div class="day-info">
+        <div class="day-tag-row"><span class="tag tag-red">Pratique</span></div>
+        <div class="day-title-main">Exercices — Jour 2</div>
+        <div class="day-subtitle">Page de profil responsive de A à Z</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Projet du jour</div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">Exercice 1</span>
+          <span class="ex-title">Jeux interactifs</span>
+          <span class="ex-time">30 min</span>
+        </div>
+        <ul class="ex-checklist">
+          <li>Compléter les 24 niveaux de <strong>flexboxfroggy.com</strong></li>
+          <li>Compléter les 10 premiers niveaux de <strong>cssgridgarden.com</strong></li>
+        </ul>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">Exercice 2 — Principal</span>
+          <span class="ex-title">Page de profil responsive</span>
+          <span class="ex-time">90 min</span>
+        </div>
+        <p style="margin-bottom:12px">Crée une page de profil (comme une mini page LinkedIn) avec :</p>
+        <ul class="ex-checklist">
+          <li>Un <code>&lt;header&gt;</code> avec navigation (logo + liens)</li>
+          <li>Une section héros avec photo, nom, titre, et 3 boutons</li>
+          <li>Une section "Compétences" avec une grille de cartes (Flexbox ou Grid)</li>
+          <li>Une section "Projets" avec 3 cartes de projets</li>
+          <li>Un <code>&lt;footer&gt;</code> avec liens réseaux sociaux</li>
+          <li>Design responsive : 1 colonne sur mobile, 3 sur desktop</li>
+          <li>Variables CSS pour les couleurs et espacements</li>
+        </ul>
+        <div class="code-block" style="margin-top:12px">
+          <div class="filename">Structure recommandée</div>
+          <pre>jour-2/
+├── index.html
+├── style.css
+└── assets/
+    └── photo.jpg (ou un placeholder)</pre>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">Exercice 3</span>
+          <span class="ex-title">Commit & push</span>
+          <span class="ex-time">10 min</span>
+        </div>
+        <ul class="ex-checklist">
+          <li>Ajouter le dossier <code>jour-2/</code> dans ton repo <code>formation-14-jours</code></li>
+          <li>Commit avec un message descriptif : <code>feat: ajoute page de profil responsive</code></li>
+          <li>Push sur GitHub</li>
+          <li>Ajouter une ligne dans <code>JOURNAL.md</code> : "Jour 2 : HTML sémantique + CSS Flexbox/Grid"</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="btn" onclick="goto('j2-css')">← CSS</button>
+      <button class="btn btn-primary" onclick="goto('j3-js')">Jour 3 : JavaScript →</button>
+    </div>
+  </section>
+
+  <!-- ======================== J3 - JS ======================== -->
+  <section class="section" id="j3-js">
+    <div class="day-header">
+      <div class="day-num-big">3</div>
+      <div class="day-info">
+        <div class="day-tag-row"><span class="tag tag-green">Théorie</span></div>
+        <div class="day-title-main">JavaScript ES6+ essentiel</div>
+        <div class="day-subtitle">Variables · Fonctions · Tableaux · DOM</div>
+        <div class="time-bar">
+          <div class="time-pill"><span class="time-dot" style="background:var(--accent2)"></span>2h théorie</div>
+          <div class="time-pill"><span class="time-dot" style="background:var(--accent)"></span>1h pratique</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">JavaScript moderne</div>
+
+      <h3>Variables : let, const (oublie var)</h3>
+      <div class="code-block">
+        <div class="filename">variables.js</div>
+        <pre><span class="cm">// const : valeur qui ne change pas (privilégier)</span>
+<span class="ck">const</span> <span class="cn">nom</span> = <span class="cs">'Alice'</span>;
+<span class="ck">const</span> <span class="cn">age</span> = <span class="cs">25</span>;
+<span class="ck">const</span> <span class="cn">actif</span> = <span class="cs">true</span>;
+
+<span class="cm">// let : valeur qui peut changer</span>
+<span class="ck">let</span> <span class="cn">compteur</span> = <span class="cs">0</span>;
+compteur = compteur + <span class="cs">1</span>;
+
+<span class="cm">// Destructuring : extraire des valeurs</span>
+<span class="ck">const</span> utilisateur = { nom: <span class="cs">'Bob'</span>, ville: <span class="cs">'Paris'</span> };
+<span class="ck">const</span> { nom, ville } = utilisateur;   <span class="cm">// nom = 'Bob'</span>
+
+<span class="ck">const</span> couleurs = [<span class="cs">'rouge'</span>, <span class="cs">'vert'</span>, <span class="cs">'bleu'</span>];
+<span class="ck">const</span> [premiere, deuxieme] = couleurs; <span class="cm">// premiere = 'rouge'</span>
+
+<span class="cm">// Template literals</span>
+<span class="ck">const</span> <span class="cn">message</span> = <span class="cs">`Bonjour ${nom}, tu as ${age} ans`</span>;</pre>
+      </div>
+
+      <h3>Fonctions fléchées</h3>
+      <div class="code-block">
+        <div class="filename">fonctions.js</div>
+        <pre><span class="cm">// Fonction classique</span>
+<span class="ck">function</span> <span class="cf">saluer</span>(nom) {
+  <span class="ck">return</span> <span class="cs">`Bonjour ${nom}`</span>;
+}
+
+<span class="cm">// Fonction fléchée (équivalent)</span>
+<span class="ck">const</span> <span class="cf">saluer</span> = (nom) => <span class="cs">`Bonjour ${nom}`</span>;
+
+<span class="cm">// Paramètre par défaut</span>
+<span class="ck">const</span> <span class="cf">saluer</span> = (nom = <span class="cs">'visiteur'</span>) => <span class="cs">`Bonjour ${nom}`</span>;
+
+<span class="cm">// Plusieurs paramètres</span>
+<span class="ck">const</span> <span class="cf">additionner</span> = (a, b) => a + b;
+
+<span class="cm">// Corps de fonction multi-lignes</span>
+<span class="ck">const</span> <span class="cf">calculer</span> = (prix, tva) => {
+  <span class="ck">const</span> total = prix * (<span class="cs">1</span> + tva);
+  <span class="ck">return</span> Math.round(total * <span class="cs">100</span>) / <span class="cs">100</span>;
+};</pre>
+      </div>
+
+      <h3>Méthodes de tableaux — les plus utiles</h3>
+      <div class="code-block">
+        <div class="filename">tableaux.js</div>
+        <pre><span class="ck">const</span> nombres = [<span class="cs">1</span>, <span class="cs">2</span>, <span class="cs">3</span>, <span class="cs">4</span>, <span class="cs">5</span>];
+
+<span class="cm">// map : transformer chaque élément</span>
+<span class="ck">const</span> doubles = nombres.<span class="cf">map</span>(n => n * <span class="cs">2</span>);
+<span class="cm">// [2, 4, 6, 8, 10]</span>
+
+<span class="cm">// filter : garder selon une condition</span>
+<span class="ck">const</span> pairs = nombres.<span class="cf">filter</span>(n => n % <span class="cs">2</span> === <span class="cs">0</span>);
+<span class="cm">// [2, 4]</span>
+
+<span class="cm">// find : trouver le premier qui correspond</span>
+<span class="ck">const</span> utilisateurs = [
+  { id: <span class="cs">1</span>, nom: <span class="cs">'Alice'</span> },
+  { id: <span class="cs">2</span>, nom: <span class="cs">'Bob'</span> }
+];
+<span class="ck">const</span> alice = utilisateurs.<span class="cf">find</span>(u => u.id === <span class="cs">1</span>);
+
+<span class="cm">// forEach : parcourir sans retourner</span>
+utilisateurs.<span class="cf">forEach</span>(u => console.<span class="cf">log</span>(u.nom));
+
+<span class="cm">// Spread : copier/fusionner des tableaux</span>
+<span class="ck">const</span> tousLesNombres = [...nombres, <span class="cs">6</span>, <span class="cs">7</span>];
+<span class="ck">const</span> copie = [...utilisateurs];</pre>
+      </div>
+
+      <h3>Manipuler le DOM</h3>
+      <div class="code-block">
+        <div class="filename">dom.js</div>
+        <pre><span class="cm">// Sélectionner des éléments</span>
+<span class="ck">const</span> titre = document.<span class="cf">querySelector</span>(<span class="cs">'h1'</span>);
+<span class="ck">const</span> bouton = document.<span class="cf">querySelector</span>(<span class="cs">'#mon-bouton'</span>);
+<span class="ck">const</span> cartes = document.<span class="cf">querySelectorAll</span>(<span class="cs">'.carte'</span>);
+
+<span class="cm">// Modifier le contenu</span>
+titre.textContent = <span class="cs">'Nouveau titre'</span>;
+titre.innerHTML = <span class="cs">'Titre avec &lt;strong&gt;gras&lt;/strong&gt;'</span>;
+
+<span class="cm">// Modifier les styles et classes</span>
+bouton.classList.<span class="cf">add</span>(<span class="cs">'actif'</span>);
+bouton.classList.<span class="cf">remove</span>(<span class="cs">'masque'</span>);
+bouton.classList.<span class="cf">toggle</span>(<span class="cs">'ouvert'</span>);
+
+<span class="cm">// Écouter les événements</span>
+bouton.<span class="cf">addEventListener</span>(<span class="cs">'click'</span>, (event) => {
+  console.<span class="cf">log</span>(<span class="cs">'cliqué !'</span>, event.target);
+});
+
+<span class="cm">// Créer et insérer un élément</span>
+<span class="ck">const</span> nouvelElement = document.<span class="cf">createElement</span>(<span class="cs">'li'</span>);
+nouvelElement.textContent = <span class="cs">'Nouvel item'</span>;
+document.<span class="cf">querySelector</span>(<span class="cs">'ul'</span>).<span class="cf">appendChild</span>(nouvelElement);</pre>
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="btn" onclick="goto('j2-ex')">← Exercices J2</button>
+      <button class="btn btn-primary" onclick="goto('j3-async')">Async & fetch →</button>
+    </div>
+  </section>
+
+  <!-- ======================== J3 - ASYNC ======================== -->
+  <section class="section" id="j3-async">
+    <div class="day-header">
+      <div class="day-num-big">3</div>
+      <div class="day-info">
+        <div class="day-tag-row"><span class="tag tag-green">Théorie</span></div>
+        <div class="day-title-main">Async / Await & fetch()</div>
+        <div class="day-subtitle">Appels API · Promises · Gestion d'erreurs</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">JavaScript asynchrone</div>
+      <p>JavaScript est <strong>non-bloquant</strong> : il peut lancer une opération longue (appel réseau, lecture de fichier) et continuer à s'exécuter pendant ce temps. <code>async/await</code> est la façon moderne de gérer ça.</p>
+
+      <h3>Promise → async/await</h3>
+      <div class="code-block">
+        <div class="filename">async.js</div>
+        <pre><span class="cm">// Version Promise (ancienne façon)</span>
+fetch(<span class="cs">'https://api.example.com/data'</span>)
+  .<span class="cf">then</span>(response => response.<span class="cf">json</span>())
+  .<span class="cf">then</span>(data => console.<span class="cf">log</span>(data))
+  .<span class="cf">catch</span>(err => console.<span class="cf">error</span>(err));
+
+<span class="cm">// Version async/await (façon moderne — préférer)</span>
+<span class="ck">async function</span> <span class="cf">chargerDonnees</span>() {
+  <span class="ck">try</span> {
+    <span class="ck">const</span> response = <span class="ck">await</span> <span class="cf">fetch</span>(<span class="cs">'https://api.example.com/data'</span>);
+
+    <span class="cm">// Vérifier que la requête a réussi</span>
+    <span class="ck">if</span> (!response.ok) {
+      <span class="ck">throw new</span> Error(<span class="cs">`Erreur HTTP: ${response.status}`</span>);
+    }
+
+    <span class="ck">const</span> data = <span class="ck">await</span> response.<span class="cf">json</span>();
+    console.<span class="cf">log</span>(data);
+    <span class="ck">return</span> data;
+
+  } <span class="ck">catch</span> (erreur) {
+    console.<span class="cf">error</span>(<span class="cs">'Erreur :'</span>, erreur.<span class="cf">message</span>);
+  }
+}</pre>
+      </div>
+
+      <h3>Exemple complet : afficher des posts</h3>
+      <div class="code-block">
+        <div class="filename">posts.js — appel API réel</div>
+        <pre><span class="cm">// JSONPlaceholder : API de test gratuite</span>
+<span class="ck">const</span> <span class="cn">URL_API</span> = <span class="cs">'https://jsonplaceholder.typicode.com'</span>;
+
+<span class="ck">async function</span> <span class="cf">afficherPosts</span>() {
+  <span class="cm">// 1. Montrer un indicateur de chargement</span>
+  <span class="ck">const</span> conteneur = document.<span class="cf">querySelector</span>(<span class="cs">'#posts'</span>);
+  conteneur.innerHTML = <span class="cs">'&lt;p&gt;Chargement...&lt;/p&gt;'</span>;
+
+  <span class="ck">try</span> {
+    <span class="cm">// 2. Appel API</span>
+    <span class="ck">const</span> response = <span class="ck">await</span> <span class="cf">fetch</span>(<span class="cs">`${URL_API}/posts?_limit=5`</span>);
+    <span class="ck">const</span> posts = <span class="ck">await</span> response.<span class="cf">json</span>();
+
+    <span class="cm">// 3. Afficher les données</span>
+    conteneur.innerHTML = posts
+      .<span class="cf">map</span>(post => <span class="cs">`
+        &lt;article&gt;
+          &lt;h3&gt;${post.title}&lt;/h3&gt;
+          &lt;p&gt;${post.body}&lt;/p&gt;
+        &lt;/article&gt;
+      `</span>)
+      .<span class="cf">join</span>(<span class="cs">''</span>);
+
+  } <span class="ck">catch</span> (erreur) {
+    <span class="cm">// 4. Gérer l'erreur</span>
+    conteneur.innerHTML = <span class="cs">`&lt;p&gt;Erreur : ${erreur.message}&lt;/p&gt;`</span>;
+  }
+}
+
+<span class="cm">// Appeler quand la page est prête</span>
+document.<span class="cf">addEventListener</span>(<span class="cs">'DOMContentLoaded'</span>, afficherPosts);</pre>
+      </div>
+
+      <div class="tip">
+        <strong>JSONPlaceholder — API de test</strong>
+        jsonplaceholder.typicode.com fournit des endpoints gratuits pour tester : /posts, /users, /photos, /todos. Parfait pour s'entraîner sans créer de backend.
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="btn" onclick="goto('j3-js')">← JS ES6+</button>
+      <button class="btn btn-primary" onclick="goto('j3-ex')">Exercices J3 →</button>
+    </div>
+  </section>
+
+  <!-- ======================== J3 - EXERCICES ======================== -->
+  <section class="section" id="j3-ex">
+    <div class="day-header">
+      <div class="day-num-big">3</div>
+      <div class="day-info">
+        <div class="day-tag-row"><span class="tag tag-red">Pratique</span></div>
+        <div class="day-title-main">Exercices — Jour 3</div>
+        <div class="day-subtitle">JS dans le DOM + premier appel API</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Exercices du jour</div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">Exercice 1</span>
+          <span class="ex-title">Manipulation DOM</span>
+          <span class="ex-time">30 min</span>
+        </div>
+        <p style="margin-bottom:10px">Crée une page HTML avec une liste de tâches (todo) en JS pur :</p>
+        <ul class="ex-checklist">
+          <li>Un champ texte + bouton "Ajouter"</li>
+          <li>Au clic, créer un élément <code>&lt;li&gt;</code> avec le texte saisi</li>
+          <li>Ajouter un bouton "✕" sur chaque item pour le supprimer</li>
+          <li>Utiliser <code>addEventListener</code> pour les interactions</li>
+          <li>Bonus : griser les tâches au clic pour les marquer "faites"</li>
+        </ul>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">Exercice 2</span>
+          <span class="ex-title">Premier appel API</span>
+          <span class="ex-time">45 min</span>
+        </div>
+        <p style="margin-bottom:10px">Utilise JSONPlaceholder pour afficher une liste d'utilisateurs :</p>
+        <ul class="ex-checklist">
+          <li>Appeler <code>https://jsonplaceholder.typicode.com/users</code></li>
+          <li>Afficher nom, email, et ville de chaque utilisateur dans des cartes</li>
+          <li>Afficher "Chargement..." pendant la requête</li>
+          <li>Afficher un message d'erreur si la requête échoue</li>
+          <li>Ajouter un champ de recherche qui filtre les cartes en temps réel</li>
+        </ul>
+        <div class="code-block" style="margin-top:12px">
+          <div class="filename">Structure de l'objet user retourné</div>
+          <pre>{ id: 1, name: "Leanne Graham",
+  username: "Bret", email: "Sincere@april.biz",
+  address: { city: "Gwenborough" },
+  phone: "1-770-736-0988" }</pre>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">Exercice 3</span>
+          <span class="ex-title">Modules ES6</span>
+          <span class="ex-time">20 min</span>
+        </div>
+        <ul class="ex-checklist">
+          <li>Créer un fichier <code>api.js</code> avec une fonction <code>fetchUsers()</code> exportée</li>
+          <li>Créer un fichier <code>ui.js</code> avec une fonction <code>renderUsers(users)</code> exportée</li>
+          <li>Dans <code>main.js</code>, importer et utiliser les deux</li>
+          <li>Ajouter <code>type="module"</code> à la balise script dans le HTML</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="btn" onclick="goto('j3-async')">← Async/fetch</button>
+      <button class="btn btn-primary" onclick="goto('j4-projet')">Jour 4 : Projet météo →</button>
+    </div>
+  </section>
+
+  <!-- ======================== J4 - PROJET ======================== -->
+  <section class="section" id="j4-projet">
+    <div class="day-header">
+      <div class="day-num-big">4</div>
+      <div class="day-info">
+        <div class="day-tag-row"><span class="tag tag-red">Pratique</span><span class="tag tag-blue">Projet complet</span></div>
+        <div class="day-title-main">Mini-projet — App météo</div>
+        <div class="day-subtitle">Tout assembler : HTML + CSS + JS + API</div>
+        <div class="time-bar">
+          <div class="time-pill"><span class="time-dot" style="background:var(--accent)"></span>4h pratique</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Description du projet</div>
+      <p>Tu vas construire une vraie application météo qui utilise <strong>Open-Meteo</strong> (API gratuite, sans clé requise). L'utilisateur saisit une ville, l'app affiche la météo actuelle et les prévisions.</p>
+
+      <h3>Fonctionnalités requises</h3>
+      <ul style="color:#b0aa9f; font-size:14px; padding-left:1.25rem; margin-bottom:1rem;">
+        <li>Champ de recherche de ville</li>
+        <li>Affichage : température, condition météo, humidité, vent</li>
+        <li>Icône météo selon la condition</li>
+        <li>Prévisions sur 5 jours (optionnel)</li>
+        <li>Design responsive et soigné</li>
+        <li>Gestion des erreurs (ville introuvable)</li>
+      </ul>
+
+      <h3>Architecture recommandée</h3>
+      <div class="code-block">
+        <div class="filename">Structure du projet</div>
+        <pre>jour-4-meteo/
+├── index.html
+├── style.css
+├── js/
+│   ├── api.js       <span class="cm">← fonctions d'appel API</span>
+│   ├── ui.js        <span class="cm">← fonctions de rendu</span>
+│   └── main.js      <span class="cm">← logique principale</span></pre>
+      </div>
+
+      <h3>Étape 1 — Géolocalisation de la ville</h3>
+      <div class="code-block">
+        <div class="filename">js/api.js</div>
+        <pre><span class="cm">// Open-Meteo Geocoding API — convertir ville → coordonnées</span>
+<span class="ck">export async function</span> <span class="cf">rechercherVille</span>(nomVille) {
+  <span class="ck">const</span> url = <span class="cs">`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(nomVille)}&count=1&language=fr`</span>;
+  <span class="ck">const</span> response = <span class="ck">await</span> <span class="cf">fetch</span>(url);
+  <span class="ck">const</span> data = <span class="ck">await</span> response.<span class="cf">json</span>();
+
+  <span class="ck">if</span> (!data.results || data.results.length === <span class="cs">0</span>) {
+    <span class="ck">throw new</span> Error(<span class="cs">'Ville introuvable'</span>);
+  }
+
+  <span class="ck">return</span> data.results[<span class="cs">0</span>]; <span class="cm">// { name, latitude, longitude, country }</span>
+}</pre>
+      </div>
+
+      <h3>Étape 2 — Appel météo</h3>
+      <div class="code-block">
+        <div class="filename">js/api.js (suite)</div>
+        <pre><span class="ck">export async function</span> <span class="cf">recupererMeteo</span>(latitude, longitude) {
+  <span class="ck">const</span> params = <span class="ck">new</span> URLSearchParams({
+    latitude, longitude,
+    current: <span class="cs">'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code'</span>,
+    daily: <span class="cs">'temperature_2m_max,temperature_2m_min,weather_code'</span>,
+    timezone: <span class="cs">'auto'</span>,
+    forecast_days: <span class="cs">5</span>
+  });
+
+  <span class="ck">const</span> url = <span class="cs">`https://api.open-meteo.com/v1/forecast?${params}`</span>;
+  <span class="ck">const</span> response = <span class="ck">await</span> <span class="cf">fetch</span>(url);
+  <span class="ck">return</span> <span class="ck">await</span> response.<span class="cf">json</span>();
+}
+
+<span class="cm">// Convertir le code météo en description</span>
+<span class="ck">export function</span> <span class="cf">codeVersDescription</span>(code) {
+  <span class="ck">const</span> codes = {
+    <span class="cs">0</span>: <span class="cs">'Ciel dégagé ☀️'</span>,  <span class="cs">1</span>: <span class="cs">'Peu nuageux 🌤️'</span>,
+    <span class="cs">2</span>: <span class="cs">'Partiellement nuageux ⛅'</span>, <span class="cs">3</span>: <span class="cs">'Couvert ☁️'</span>,
+    <span class="cs">61</span>: <span class="cs">'Pluie légère 🌧️'</span>, <span class="cs">63</span>: <span class="cs">'Pluie modérée 🌧️'</span>,
+    <span class="cs">71</span>: <span class="cs">'Neige 🌨️'</span>, <span class="cs">95</span>: <span class="cs">'Orage ⛈️'</span>
+  };
+  <span class="ck">return</span> codes[code] || <span class="cs">'Conditions inconnues 🌡️'</span>;
+}</pre>
+      </div>
+
+      <h3>Étape 3 — Logique principale</h3>
+      <div class="code-block">
+        <div class="filename">js/main.js</div>
+        <pre><span class="ck">import</span> { rechercherVille, recupererMeteo, codeVersDescription }
+  <span class="ck">from</span> <span class="cs">'./api.js'</span>;
+
+<span class="ck">const</span> formulaire = document.<span class="cf">querySelector</span>(<span class="cs">'#recherche'</span>);
+<span class="ck">const</span> resultat = document.<span class="cf">querySelector</span>(<span class="cs">'#resultat'</span>);
+
+formulaire.<span class="cf">addEventListener</span>(<span class="cs">'submit'</span>, <span class="ck">async</span> (e) => {
+  e.<span class="cf">preventDefault</span>();
+  <span class="ck">const</span> ville = formulaire.<span class="cf">querySelector</span>(<span class="cs">'input'</span>).value.<span class="cf">trim</span>();
+  <span class="ck">if</span> (!ville) <span class="ck">return</span>;
+
+  resultat.innerHTML = <span class="cs">'&lt;p class="chargement"&gt;Recherche...&lt;/p&gt;'</span>;
+
+  <span class="ck">try</span> {
+    <span class="ck">const</span> lieu = <span class="ck">await</span> <span class="cf">rechercherVille</span>(ville);
+    <span class="ck">const</span> meteo = <span class="ck">await</span> <span class="cf">recupererMeteo</span>(lieu.latitude, lieu.longitude);
+    <span class="ck">const</span> actuelle = meteo.current;
+
+    resultat.innerHTML = <span class="cs">`
+      &lt;div class="meteo-carte"&gt;
+        &lt;h2&gt;${lieu.name}, ${lieu.country}&lt;/h2&gt;
+        &lt;div class="temperature"&gt;${Math.round(actuelle.temperature_2m)}°C&lt;/div&gt;
+        &lt;p&gt;${codeVersDescription(actuelle.weather_code)}&lt;/p&gt;
+        &lt;div class="details"&gt;
+          &lt;span&gt;💧 ${actuelle.relative_humidity_2m}%&lt;/span&gt;
+          &lt;span&gt;💨 ${actuelle.wind_speed_10m} km/h&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    `</span>;
+  } <span class="ck">catch</span> (err) {
+    resultat.innerHTML = <span class="cs">`&lt;p class="erreur"&gt;❌ ${err.message}&lt;/p&gt;`</span>;
+  }
+});</pre>
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="btn" onclick="goto('j3-ex')">← Exercices J3</button>
+      <button class="btn btn-primary" onclick="goto('j4-deploy')">Déploiement →</button>
+    </div>
+  </section>
+
+  <!-- ======================== J4 - DEPLOY ======================== -->
+  <section class="section" id="j4-deploy">
+    <div class="day-header">
+      <div class="day-num-big">4</div>
+      <div class="day-info">
+        <div class="day-tag-row"><span class="tag tag-red">Pratique</span></div>
+        <div class="day-title-main">Déployer sur GitHub Pages</div>
+        <div class="day-subtitle">Mettre ton app en ligne gratuitement en 5 minutes</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">GitHub Pages</div>
+      <p>GitHub Pages héberge gratuitement des sites statiques (HTML/CSS/JS) directement depuis un dépôt GitHub. Parfait pour les projets sans backend.</p>
+
+      <h3>Méthode 1 — Depuis GitHub.com</h3>
+      <div class="code-block">
+        <div class="filename">Étapes</div>
+        <pre><span class="cs">1.</span> Aller sur ton dépôt GitHub
+<span class="cs">2.</span> Cliquer sur ⚙️ Settings
+<span class="cs">3.</span> Section "Pages" dans la sidebar
+<span class="cs">4.</span> Source : Deploy from a branch
+<span class="cs">5.</span> Branch : main / (root)
+<span class="cs">6.</span> Sauvegarder → attendre 1-2 min
+<span class="cs">7.</span> URL générée : https://TON-USER.github.io/TON-REPO/</pre>
+      </div>
+
+      <h3>Méthode 2 — Avec Vercel (plus flexible)</h3>
+      <div class="code-block">
+        <div class="filename">Vercel CLI</div>
+        <pre><span class="cm"># Installer Vercel CLI</span>
+npm install -g vercel
+
+<span class="cm"># Dans le dossier de ton projet</span>
+vercel
+
+<span class="cm"># Suivre les instructions → URL publique en 30 secondes</span>
+<span class="cm"># Chaque git push redéploie automatiquement</span></pre>
+      </div>
+
+      <div class="warn">
+        <strong>Attention avec les modules ES6 et GitHub Pages</strong>
+        Si tu utilises <code>type="module"</code>, assure-toi que ton serveur envoie le bon Content-Type. Sur GitHub Pages ça marche. En local, utilise l'extension "Live Server" de VS Code ou <code>npx serve .</code> plutôt d'ouvrir le fichier HTML directement.
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="btn" onclick="goto('j4-projet')">← Mini-projet</button>
+      <button class="btn btn-primary" onclick="goto('j4-bilan')">Bilan Phase 1 →</button>
+    </div>
+  </section>
+
+  <!-- ======================== J4 - BILAN ======================== -->
+  <section class="section" id="j4-bilan">
+    <div class="day-header">
+      <div class="day-num-big">✓</div>
+      <div class="day-info">
+        <div class="day-tag-row"><span class="tag tag-blue">Bilan</span></div>
+        <div class="day-title-main">Checklist Phase 1</div>
+        <div class="day-subtitle">Ce que tu dois savoir avant de passer à Vue/React</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Compétences acquises</div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">Environnement</span>
+          <span class="ex-title">Jour 1 — Outils</span>
+        </div>
+        <ul class="ex-checklist">
+          <li>VS Code configuré avec extensions et Prettier</li>
+          <li>Node.js et npm installés et fonctionnels</li>
+          <li>Terminal : naviguer, créer, déplacer des fichiers</li>
+          <li>Git : init, add, commit, push maîtrisés</li>
+          <li>Dépôt GitHub créé avec historique de commits propre</li>
+        </ul>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">HTML / CSS</span>
+          <span class="ex-title">Jour 2 — Mise en page</span>
+        </div>
+        <ul class="ex-checklist">
+          <li>Structure HTML sémantique (header, main, article, section, footer)</li>
+          <li>Flexbox : centrer, répartir, aligner</li>
+          <li>Grid : grilles responsive avec auto-fit</li>
+          <li>Variables CSS pour les couleurs et espacements</li>
+          <li>Media queries : design mobile-first</li>
+        </ul>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">JavaScript</span>
+          <span class="ex-title">Jours 3–4 — Logique & API</span>
+        </div>
+        <ul class="ex-checklist">
+          <li>const/let, template literals, destructuring</li>
+          <li>Fonctions fléchées</li>
+          <li>map(), filter(), find(), forEach() sur les tableaux</li>
+          <li>Manipulation DOM : querySelector, addEventListener, innerHTML</li>
+          <li>async/await et try/catch</li>
+          <li>fetch() : appeler une API et afficher les données</li>
+          <li>Modules ES6 : import/export</li>
+        </ul>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <span class="ex-badge">Projet</span>
+          <span class="ex-title">Livrable Phase 1</span>
+        </div>
+        <ul class="ex-checklist">
+          <li>App météo fonctionnelle en ligne (GitHub Pages ou Vercel)</li>
+          <li>Code organisé en modules (api.js, ui.js, main.js)</li>
+          <li>Gestion des erreurs implémentée</li>
+          <li>Repo GitHub avec commits conventionnels</li>
+          <li>JOURNAL.md mis à jour pour les 4 jours</li>
+        </ul>
+      </div>
+
+      <div class="tip">
+        <strong>Prêt pour la Phase 2 ?</strong>
+        Si tu peux faire tout ce qui précède sans regarder les notes, tu es prêt. Sinon, prends un jour de plus pour consolider. La Phase 2 (Vue ou React) s'appuie directement sur ces bases. Un fondation fragile ralentit tout.
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="btn" onclick="goto('j4-deploy')">← Déploiement</button>
+      <button class="btn btn-primary" disabled>Phase 2 : Vue/React →</button>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+const sectionIds = ['j1-env','j1-git','j1-ex','j2-html','j2-css','j2-ex','j3-js','j3-async','j3-ex','j4-projet','j4-deploy','j4-bilan'];
+const progress = document.getElementById('progress');
+
+function goto(id) {
+  sections.forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+
+  navItems.forEach(n => {
+    const fn = n.getAttribute('onclick');
+    n.classList.toggle('active', fn && fn.includes(`'${id}'`));
+  });
+
+  const idx = sectionIds.indexOf(id);
+  if (idx >= 0) {
+    progress.style.width = Math.round(((idx + 1) / sectionIds.length) * 100) + '%';
+  }
+
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
