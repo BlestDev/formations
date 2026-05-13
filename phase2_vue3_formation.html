@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 2 — Vue 3 · 14 Jours Dev</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: #30363d;
+    --accent: #4fc08d;
+    --accent2: #89b4fa;
+    --accent3: #f38ba8;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --code-bg: #0d1117;
+    --tag-green: #0d2b1e;
+    --tag-green-t: #56d198;
+    --tag-blue: #0a1929;
+    --tag-blue-t: #79aef0;
+    --tag-orange: #2b1800;
+    --tag-orange-t: #e8a94a;
+    --tag-red: #2b0d14;
+    --tag-red-t: #f095a8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.7; }
+
+  .layout { display: grid; grid-template-columns: 270px 1fr; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
+  .sidebar-logo { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+  .logo-phase { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .logo-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 600; color: var(--accent); line-height: 1.2; }
+  .logo-sub { font-size: 12px; color: var(--muted); margin-top: 5px; }
+  .logo-badge { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; background: var(--tag-green); color: var(--tag-green-t); font-size: 11px; padding: 3px 10px; border-radius: 100px; }
+  .sidebar-body { flex: 1; padding: 1rem; overflow-y: auto; }
+  .nav-group { margin-bottom: 0.25rem; }
+  .nav-group-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 8px 8px 4px; }
+  .nav-btn { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--muted); background: none; border: none; text-align: left; font-family: 'DM Sans', sans-serif; transition: all 0.12s; }
+  .nav-btn:hover { background: var(--surface2); color: var(--text); }
+  .nav-btn.active { background: #0d2b1e; color: var(--accent); font-weight: 500; }
+  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0; transition: background 0.12s; }
+  .nav-btn.active .nav-dot { background: var(--accent); }
+
+  /* Progress */
+  .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); }
+  .prog-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .prog-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
+
+  /* Main */
+  .main { padding: 3rem 4rem; max-width: 880px; }
+  .section { display: none; }
+  .section.active { display: block; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Day header */
+  .day-header { display: flex; gap: 1.5rem; margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .day-num-big { font-family: 'Fraunces', serif; font-size: 80px; font-weight: 300; font-style: italic; color: var(--border); line-height: 1; width: 90px; text-align: center; flex-shrink: 0; }
+  .day-info { flex: 1; }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .tag { font-size: 11px; padding: 3px 10px; border-radius: 100px; font-weight: 500; }
+  .tag-green { background: var(--tag-green); color: var(--tag-green-t); }
+  .tag-blue { background: var(--tag-blue); color: var(--tag-blue-t); }
+  .tag-orange { background: var(--tag-orange); color: var(--tag-orange-t); }
+  .tag-red { background: var(--tag-red); color: var(--tag-red-t); }
+  .day-title { font-family: 'Fraunces', serif; font-size: 34px; font-weight: 600; color: var(--text); line-height: 1.2; margin-bottom: 8px; }
+  .day-sub { color: var(--muted); font-size: 14px; }
+  .time-pills { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .time-pill { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); background: var(--surface2); padding: 4px 10px; border-radius: 100px; border: 1px solid var(--border); }
+  .tdot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* Content */
+  .block { margin-bottom: 2.5rem; }
+  .block-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
+  .block-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .block h3 { font-family: 'Fraunces', serif; font-size: 21px; font-weight: 600; color: var(--text); margin: 1.5rem 0 0.75rem; }
+  .block h3:first-child { margin-top: 0; }
+  .block p { color: #9da8b5; font-size: 14px; margin-bottom: 0.75rem; line-height: 1.7; }
+  .block ul, .block ol { color: #9da8b5; font-size: 14px; padding-left: 1.25rem; }
+  .block li { margin-bottom: 5px; }
+
+  /* Code */
+  .code-wrap { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 1rem 0; }
+  .code-top { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .code-fname { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .code-lang { font-size: 10px; color: var(--accent); background: var(--tag-green); padding: 2px 7px; border-radius: 4px; }
+  pre { font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.65; padding: 1.25rem 1.5rem; color: #adbac7; overflow-x: auto; white-space: pre; }
+  .cm { color: #545d68; font-style: italic; }
+  .ck { color: #f47067; }
+  .cs { color: #96d0ff; }
+  .cn { color: #cae8ff; }
+  .co { color: var(--accent); }
+  .cf { color: #dcbdfb; }
+  .cv { color: #6cb6ff; }
+
+  /* Exercise */
+  .ex { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+  .ex-head { display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem; }
+  .ex-badge { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); background: var(--tag-green); padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+  .ex-title { font-weight: 500; font-size: 14px; color: var(--text); }
+  .ex-time { font-size: 12px; color: var(--muted); margin-left: auto; }
+  .ex p, .ex li { font-size: 13px; color: #9da8b5; }
+  .ex ul { padding-left: 1.25rem; }
+  .ex li { margin-bottom: 4px; }
+  .checklist { list-style: none; padding: 0; margin-top: 10px; }
+  .checklist li { display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; font-size: 13px; color: #9da8b5; }
+  .checklist li::before { content: '○'; color: var(--border); flex-shrink: 0; margin-top: 1px; font-size: 12px; }
+
+  /* Info boxes */
+  .tip { background: #0a1929; border: 1px solid #1a3a5c; border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; font-size: 13px; color: var(--tag-blue-t); line-height: 1.6; }
+  .tip strong { color: var(--accent2); display: block; margin-bottom: 4px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .warn { background: #1c1400; border: 1px solid #4a3800; border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; font-size: 13px; color: var(--tag-orange-t); line-height: 1.6; }
+  .warn strong { color: #f0c040; display: block; margin-bottom: 4px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .success { background: var(--tag-green); border: 1px solid #1a4a30; border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; font-size: 13px; color: var(--tag-green-t); line-height: 1.6; }
+  .success strong { color: var(--accent); display: block; margin-bottom: 4px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  code { font-family: 'DM Mono', monospace; font-size: 12px; background: var(--surface2); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+
+  /* Nav footer */
+  .nav-footer { display: flex; gap: 12px; justify-content: space-between; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .btn { display: flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary { background: var(--accent); color: #0d1117; border-color: var(--accent); }
+  .btn-primary:hover { background: #3aad78; color: #0d1117; border-color: #3aad78; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); }
+
+  .divider { height: 1px; background: var(--border); margin: 2rem 0; }
+
+  /* Concept card */
+  .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 1rem 0; }
+  .concept-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+  .concept-icon { font-size: 20px; margin-bottom: 8px; }
+  .concept-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .concept-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* Schema diagram */
+  .schema { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin: 1rem 0; font-family: 'DM Mono', monospace; font-size: 12px; color: #9da8b5; line-height: 2; }
+  .schema .highlight { color: var(--accent); }
+  .schema .arrow { color: var(--muted); }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { height: auto; position: static; }
+    .main { padding: 2rem 1.5rem; }
+    .day-header { flex-direction: column; }
+    .day-num-big { font-size: 50px; width: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-phase">Formation · 14 Jours Dev</div>
+    <div class="logo-title">Phase 2<br>Vue 3</div>
+    <div class="logo-sub">Composition API · Router · Pinia</div>
+    <div class="logo-badge">🟢 Jours 5 → 9</div>
+  </div>
+
+  <div class="sidebar-body">
+    <div class="nav-group">
+      <div class="nav-group-label">Jour 5 — Vue 3 Bases</div>
+      <button class="nav-btn active" onclick="goto('j5-intro')"><span class="nav-dot"></span>Pourquoi Vue 3 ?</button>
+      <button class="nav-btn" onclick="goto('j5-setup')"><span class="nav-dot"></span>Créer un projet Vite</button>
+      <button class="nav-btn" onclick="goto('j5-reactivity')"><span class="nav-dot"></span>ref, reactive, computed</button>
+      <button class="nav-btn" onclick="goto('j5-directives')"><span class="nav-dot"></span>Directives du template</button>
+      <button class="nav-btn" onclick="goto('j5-ex')"><span class="nav-dot"></span>Exercices J5</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Jour 6 — Composants</div>
+      <button class="nav-btn" onclick="goto('j6-composants')"><span class="nav-dot"></span>Composants & SFC</button>
+      <button class="nav-btn" onclick="goto('j6-props')"><span class="nav-dot"></span>Props & Emit</button>
+      <button class="nav-btn" onclick="goto('j6-slots')"><span class="nav-dot"></span>Slots</button>
+      <button class="nav-btn" onclick="goto('j6-ex')"><span class="nav-dot"></span>Exercices J6</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Jour 7 — Router & Pinia</div>
+      <button class="nav-btn" onclick="goto('j7-router')"><span class="nav-dot"></span>Vue Router</button>
+      <button class="nav-btn" onclick="goto('j7-pinia')"><span class="nav-dot"></span>Pinia (état global)</button>
+      <button class="nav-btn" onclick="goto('j7-ex')"><span class="nav-dot"></span>Exercices J7</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Jour 8 — API & Lifecycle</div>
+      <button class="nav-btn" onclick="goto('j8-lifecycle')"><span class="nav-dot"></span>Lifecycle Hooks</button>
+      <button class="nav-btn" onclick="goto('j8-api')"><span class="nav-dot"></span>Appels API dans Vue</button>
+      <button class="nav-btn" onclick="goto('j8-ex')"><span class="nav-dot"></span>Exercices J8</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Jour 9 — Projet complet</div>
+      <button class="nav-btn" onclick="goto('j9-projet')"><span class="nav-dot"></span>App "Carnet de notes"</button>
+      <button class="nav-btn" onclick="goto('j9-deploy')"><span class="nav-dot"></span>Build & Déploiement</button>
+      <button class="nav-btn" onclick="goto('j9-bilan')"><span class="nav-dot"></span>Bilan Phase 2</button>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="prog-label"><span>Progression</span><span id="prog-pct">6%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:6%"></div></div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ═══════════════════════════════════════════════════════ J5 INTRO -->
+<section class="section active" id="j5-intro">
+  <div class="day-header">
+    <div class="day-num-big">5</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-green">Théorie</span><span class="tag tag-blue">Concept</span></div>
+      <div class="day-title">Pourquoi Vue 3 ?</div>
+      <div class="day-sub">Comprendre ce que change un framework avant de coder</div>
+      <div class="time-pills">
+        <div class="time-pill"><span class="tdot" style="background:var(--accent2)"></span>30 min théorie</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Le problème que Vue résout</div>
+    <p>Avec du JS pur, synchroniser l'interface et les données devient vite un cauchemar. Tu dois manuellement trouver les éléments DOM et les mettre à jour à chaque changement.</p>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Problème avec JS pur</span><span class="code-lang">JS</span></div>
+      <pre><span class="cm">// Avec JS pur : beaucoup de code pour peu de résultat</span>
+<span class="ck">let</span> <span class="cn">compteur</span> = <span class="cs">0</span>;
+<span class="ck">const</span> <span class="cn">btn</span> = document.<span class="cf">querySelector</span>(<span class="cs">'#btn'</span>);
+<span class="ck">const</span> <span class="cn">affichage</span> = document.<span class="cf">querySelector</span>(<span class="cs">'#affichage'</span>);
+
+btn.<span class="cf">addEventListener</span>(<span class="cs">'click'</span>, () => {
+  compteur++;
+  affichage.textContent = compteur; <span class="cm">// ← MAJ manuelle du DOM</span>
+});
+<span class="cm">// Et si tu as 50 endroits à mettre à jour ? 😰</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Solution avec Vue 3</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="ck">import</span> { ref } <span class="ck">from</span> <span class="cs">'vue'</span>
+<span class="ck">const</span> <span class="cn">compteur</span> = <span class="cf">ref</span>(<span class="cs">0</span>)
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="ck">&lt;template&gt;</span>
+  <span class="cm">&lt;!-- Vue met à jour le DOM automatiquement --&gt;</span>
+  <span class="ck">&lt;button</span> @click=<span class="cs">"compteur++"</span><span class="ck">&gt;</span>Cliqué {{ compteur }} fois<span class="ck">&lt;/button&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+
+    <h3>Les 4 piliers de Vue 3</h3>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">⚡</div>
+        <div class="concept-name">Réactivité</div>
+        <div class="concept-desc">Le DOM se met à jour automatiquement quand tes données changent</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🧩</div>
+        <div class="concept-name">Composants</div>
+        <div class="concept-desc">Découper l'interface en blocs réutilisables et isolés</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🔀</div>
+        <div class="concept-name">Router</div>
+        <div class="concept-desc">Navigation entre pages sans rechargement (SPA)</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🗃️</div>
+        <div class="concept-name">Pinia</div>
+        <div class="concept-desc">État global partagé entre tous les composants</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>SFC — Single File Component</strong>
+      Un fichier <code>.vue</code> contient tout ce dont un composant a besoin : le HTML (template), la logique JS (script) et le CSS (style) dans un seul fichier. C'est la grande force de Vue.
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" disabled>← Phase 1</button>
+    <button class="btn btn-primary" onclick="goto('j5-setup')">Créer un projet →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J5 SETUP -->
+<section class="section" id="j5-setup">
+  <div class="day-header">
+    <div class="day-num-big">5</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-green">Théorie</span><span class="tag tag-blue">Installation</span></div>
+      <div class="day-title">Créer un projet avec Vite</div>
+      <div class="day-sub">Structure d'un projet Vue 3 · Vite · SFC</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Initialiser le projet</div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Terminal — création du projet</span><span class="code-lang">bash</span></div>
+      <pre><span class="cm"># Créer un projet Vue 3 avec Vite</span>
+npm create vue@latest mon-projet
+
+<span class="cm"># Répondre aux questions :</span>
+<span class="cm"># ✔ Add TypeScript? → No (pour l'instant)</span>
+<span class="cm"># ✔ Add Vue Router? → Yes</span>
+<span class="cm"># ✔ Add Pinia? → Yes</span>
+<span class="cm"># ✔ Add ESLint? → Yes</span>
+<span class="cm"># ✔ Le reste → No</span>
+
+cd mon-projet
+npm install
+npm run dev        <span class="cm"># démarre sur http://localhost:5173</span></pre>
+    </div>
+
+    <h3>Structure générée</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Architecture du projet</span><span class="code-lang">bash</span></div>
+      <pre>mon-projet/
+├── <span class="co">src/</span>
+│   ├── <span class="co">components/</span>       <span class="cm">← tes composants réutilisables</span>
+│   ├── <span class="co">views/</span>            <span class="cm">← tes pages (liées au router)</span>
+│   ├── <span class="co">stores/</span>           <span class="cm">← tes stores Pinia</span>
+│   ├── <span class="co">router/</span>
+│   │   └── index.js      <span class="cm">← configuration des routes</span>
+│   ├── App.vue           <span class="cm">← composant racine</span>
+│   └── main.js           <span class="cm">← point d'entrée
+├── </span>index.html
+├── package.json
+└── vite.config.js</pre>
+    </div>
+
+    <h3>Anatomie d'un fichier .vue (SFC)</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/components/MonComposant.vue</span><span class="code-lang">Vue</span></div>
+      <pre><span class="cm">&lt;!-- 1. Le template : le HTML du composant --&gt;</span>
+<span class="ck">&lt;template&gt;</span>
+  <span class="ck">&lt;div</span> class=<span class="cs">"ma-carte"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;h2&gt;</span>{{ titre }}<span class="ck">&lt;/h2&gt;</span>
+    <span class="ck">&lt;p&gt;</span>Compteur : {{ compteur }}<span class="ck">&lt;/p&gt;</span>
+    <span class="ck">&lt;button</span> @click=<span class="cs">"incrementer"</span><span class="ck">&gt;</span>+1<span class="ck">&lt;/button&gt;</span>
+  <span class="ck">&lt;/div&gt;</span>
+<span class="ck">&lt;/template&gt;</span>
+
+<span class="cm">&lt;!-- 2. La logique : script setup (Composition API) --&gt;</span>
+<span class="ck">&lt;script setup&gt;</span>
+<span class="ck">import</span> { ref } <span class="ck">from</span> <span class="cs">'vue'</span>
+
+<span class="ck">const</span> <span class="cn">titre</span> = <span class="cs">'Ma Carte'</span>
+<span class="ck">const</span> <span class="cn">compteur</span> = <span class="cf">ref</span>(<span class="cs">0</span>)
+
+<span class="ck">function</span> <span class="cf">incrementer</span>() {
+  compteur.value++   <span class="cm">// .value pour modifier un ref en JS</span>
+}
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="cm">&lt;!-- 3. Le style : scopé au composant (n'affecte pas le reste) --&gt;</span>
+<span class="ck">&lt;style scoped&gt;</span>
+<span class="cn">.ma-carte</span> {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+}
+<span class="ck">&lt;/style&gt;</span></pre>
+    </div>
+
+    <div class="warn">
+      <strong>ref().value — la règle d'or</strong>
+      Dans <code>&lt;script setup&gt;</code>, pour lire ou modifier un <code>ref</code>, utilise <code>compteur.value</code>. Mais dans le <code>&lt;template&gt;</code>, Vue "déballe" automatiquement : écris juste <code>{{ compteur }}</code> sans <code>.value</code>.
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j5-intro')">← Intro Vue</button>
+    <button class="btn btn-primary" onclick="goto('j5-reactivity')">Réactivité →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J5 REACTIVITY -->
+<section class="section" id="j5-reactivity">
+  <div class="day-header">
+    <div class="day-num-big">5</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-green">Théorie</span></div>
+      <div class="day-title">ref, reactive & computed</div>
+      <div class="day-sub">Les trois outils de la réactivité Vue 3</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">La réactivité en détail</div>
+
+    <h3>ref() — valeurs primitives</h3>
+    <p>Utilise <code>ref()</code> pour les valeurs simples : nombres, chaînes, booléens, et même les tableaux.</p>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">ref() — exemples</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">import</span> { ref } <span class="ck">from</span> <span class="cs">'vue'</span>
+
+<span class="cm">// Valeurs primitives</span>
+<span class="ck">const</span> <span class="cn">nom</span> = <span class="cf">ref</span>(<span class="cs">'Alice'</span>)
+<span class="ck">const</span> <span class="cn">age</span> = <span class="cf">ref</span>(<span class="cs">25</span>)
+<span class="ck">const</span> <span class="cn">estConnecte</span> = <span class="cf">ref</span>(<span class="cs">false</span>)
+<span class="ck">const</span> <span class="cn">taches</span> = <span class="cf">ref</span>([])   <span class="cm">// tableau vide</span>
+
+<span class="cm">// Modifier (toujours .value dans le script)</span>
+nom.value = <span class="cs">'Bob'</span>
+age.value++
+estConnecte.value = <span class="cs">true</span>
+taches.value.<span class="cf">push</span>({ id: <span class="cs">1</span>, texte: <span class="cs">'Apprendre Vue'</span> })</pre>
+    </div>
+
+    <h3>reactive() — objets complexes</h3>
+    <p>Utilise <code>reactive()</code> pour les objets. Pas besoin de <code>.value</code>, tu accèdes directement aux propriétés.</p>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">reactive() — exemples</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">import</span> { reactive } <span class="ck">from</span> <span class="cs">'vue'</span>
+
+<span class="ck">const</span> <span class="cn">utilisateur</span> = <span class="cf">reactive</span>({
+  nom: <span class="cs">'Alice'</span>,
+  age: <span class="cs">25</span>,
+  adresse: {
+    ville: <span class="cs">'Paris'</span>
+  }
+})
+
+<span class="cm">// Modifier directement (pas de .value)</span>
+utilisateur.nom = <span class="cs">'Bob'</span>
+utilisateur.age++
+utilisateur.adresse.ville = <span class="cs">'Lyon'</span>
+
+<span class="cm">// Dans le template :</span>
+<span class="cm">// &lt;p&gt;{{ utilisateur.nom }} habite à {{ utilisateur.adresse.ville }}&lt;/p&gt;</span></pre>
+    </div>
+
+    <h3>computed() — valeurs dérivées</h3>
+    <p>Un <code>computed</code> se recalcule automatiquement quand ses dépendances changent. Ne jamais modifier un computed directement.</p>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">computed() — exemple complet</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">import</span> { ref, computed } <span class="ck">from</span> <span class="cs">'vue'</span>
+
+<span class="ck">const</span> <span class="cn">taches</span> = <span class="cf">ref</span>([
+  { id: <span class="cs">1</span>, texte: <span class="cs">'Apprendre Vue'</span>, fait: <span class="cs">true</span> },
+  { id: <span class="cs">2</span>, texte: <span class="cs">'Créer un projet'</span>, fait: <span class="cs">false</span> },
+  { id: <span class="cs">3</span>, texte: <span class="cs">'Déployer'</span>, fait: <span class="cs">false</span> }
+])
+
+<span class="cm">// Se recalcule automatiquement quand taches.value change</span>
+<span class="ck">const</span> <span class="cn">nombreFaites</span> = <span class="cf">computed</span>(() =>
+  taches.value.<span class="cf">filter</span>(t => t.fait).length
+)
+
+<span class="ck">const</span> <span class="cn">tachesRestantes</span> = <span class="cf">computed</span>(() =>
+  taches.value.<span class="cf">filter</span>(t => !t.fait)
+)
+
+<span class="ck">const</span> <span class="cn">progression</span> = <span class="cf">computed</span>(() => {
+  <span class="ck">if</span> (taches.value.length === <span class="cs">0</span>) <span class="ck">return</span> <span class="cs">0</span>
+  <span class="ck">return</span> Math.<span class="cf">round</span>(nombreFaites.value / taches.value.length * <span class="cs">100</span>)
+})
+
+<span class="cm">// Dans le template :</span>
+<span class="cm">// &lt;p&gt;{{ nombreFaites }} / {{ taches.length }} ({{ progression }}%)&lt;/p&gt;</span></pre>
+    </div>
+
+    <div class="tip">
+      <strong>Règle simple : ref ou reactive ?</strong>
+      Commence par tout mettre dans <code>ref()</code>. C'est plus simple et cohérent. Utilise <code>reactive()</code> uniquement pour des objets avec plusieurs propriétés liées (ex : un formulaire avec 5 champs).
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j5-setup')">← Structure projet</button>
+    <button class="btn btn-primary" onclick="goto('j5-directives')">Directives →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J5 DIRECTIVES -->
+<section class="section" id="j5-directives">
+  <div class="day-header">
+    <div class="day-num-big">5</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-green">Théorie</span></div>
+      <div class="day-title">Directives du template</div>
+      <div class="day-sub">v-if · v-for · v-bind · v-model · v-on</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Les directives Vue</div>
+    <p>Les directives sont des attributs spéciaux préfixés par <code>v-</code> qui donnent des instructions à Vue sur comment rendre le DOM.</p>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Toutes les directives essentielles</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">&lt;template&gt;</span>
+  <span class="cm">&lt;!-- v-if / v-else-if / v-else : affichage conditionnel --&gt;</span>
+  <span class="ck">&lt;p</span> <span class="cv">v-if</span>=<span class="cs">"estConnecte"</span><span class="ck">&gt;</span>Bienvenue !<span class="ck">&lt;/p&gt;</span>
+  <span class="ck">&lt;p</span> <span class="cv">v-else</span><span class="ck">&gt;</span>Veuillez vous connecter<span class="ck">&lt;/p&gt;</span>
+
+  <span class="cm">&lt;!-- v-show : masque via CSS (reste dans le DOM) --&gt;</span>
+  <span class="ck">&lt;div</span> <span class="cv">v-show</span>=<span class="cs">"chargement"</span><span class="ck">&gt;</span>Chargement...<span class="ck">&lt;/div&gt;</span>
+
+  <span class="cm">&lt;!-- v-for : boucle (toujours avec :key !) --&gt;</span>
+  <span class="ck">&lt;ul&gt;</span>
+    <span class="ck">&lt;li</span> <span class="cv">v-for</span>=<span class="cs">"tache in taches"</span> <span class="cv">:key</span>=<span class="cs">"tache.id"</span><span class="ck">&gt;</span>
+      {{ tache.texte }}
+    <span class="ck">&lt;/li&gt;</span>
+  <span class="ck">&lt;/ul&gt;</span>
+
+  <span class="cm">&lt;!-- v-bind (raccourci :) : lier un attribut à une donnée --&gt;</span>
+  <span class="ck">&lt;img</span> <span class="cv">:src</span>=<span class="cs">"imageUrl"</span> <span class="cv">:alt</span>=<span class="cs">"imageAlt"</span><span class="ck">&gt;</span>
+  <span class="ck">&lt;button</span> <span class="cv">:disabled</span>=<span class="cs">"estChargement"</span><span class="ck">&gt;</span>Envoyer<span class="ck">&lt;/button&gt;</span>
+  <span class="ck">&lt;div</span> <span class="cv">:class</span>=<span class="cs">"{ 'actif': estActif, 'erreur': aUneErreur }"</span><span class="ck">&gt;</span><span class="ck">&lt;/div&gt;</span>
+
+  <span class="cm">&lt;!-- v-on (raccourci @) : écouter des événements --&gt;</span>
+  <span class="ck">&lt;button</span> @click=<span class="cs">"soumettre"</span><span class="ck">&gt;</span>Envoyer<span class="ck">&lt;/button&gt;</span>
+  <span class="ck">&lt;input</span> @keyup.enter=<span class="cs">"chercher"</span><span class="ck">&gt;</span>
+  <span class="ck">&lt;form</span> @submit.prevent=<span class="cs">"valider"</span><span class="ck">&gt;</span><span class="ck">&lt;/form&gt;</span>
+
+  <span class="cm">&lt;!-- v-model : liaison bidirectionnelle (input ↔ donnée) --&gt;</span>
+  <span class="ck">&lt;input</span> <span class="cv">v-model</span>=<span class="cs">"recherche"</span> placeholder=<span class="cs">"Chercher..."</span><span class="ck">&gt;</span>
+  <span class="ck">&lt;textarea</span> <span class="cv">v-model</span>=<span class="cs">"message"</span><span class="ck">&gt;&lt;/textarea&gt;</span>
+  <span class="ck">&lt;input</span> type=<span class="cs">"checkbox"</span> <span class="cv">v-model</span>=<span class="cs">"accepte"</span><span class="ck">&gt;</span>
+  <span class="ck">&lt;select</span> <span class="cv">v-model</span>=<span class="cs">"categorie"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;option</span> value=<span class="cs">"vue"</span><span class="ck">&gt;</span>Vue<span class="ck">&lt;/option&gt;</span>
+  <span class="ck">&lt;/select&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+
+    <div class="warn">
+      <strong>v-for sans :key = bug</strong>
+      Toujours ajouter <code>:key</code> sur un <code>v-for</code>. C'est ce qui permet à Vue de savoir quel élément mettre à jour. Utilise un identifiant unique (id de la donnée), jamais l'index du tableau.
+    </div>
+
+    <h3>Exemple : liste de tâches avec interactions</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Taches.vue — composant complet</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="ck">import</span> { ref, computed } <span class="ck">from</span> <span class="cs">'vue'</span>
+
+<span class="ck">const</span> <span class="cn">nouvelleTache</span> = <span class="cf">ref</span>(<span class="cs">''</span>)
+<span class="ck">const</span> <span class="cn">taches</span> = <span class="cf">ref</span>([
+  { id: <span class="cs">1</span>, texte: <span class="cs">'Apprendre Vue 3'</span>, fait: <span class="cs">false</span> }
+])
+
+<span class="ck">const</span> <span class="cn">restantes</span> = <span class="cf">computed</span>(() => taches.value.<span class="cf">filter</span>(t => !t.fait).length)
+
+<span class="ck">function</span> <span class="cf">ajouterTache</span>() {
+  <span class="ck">if</span> (!nouvelleTache.value.<span class="cf">trim</span>()) <span class="ck">return</span>
+  taches.value.<span class="cf">push</span>({
+    id: Date.<span class="cf">now</span>(),
+    texte: nouvelleTache.value,
+    fait: <span class="cs">false</span>
+  })
+  nouvelleTache.value = <span class="cs">''</span>
+}
+
+<span class="ck">function</span> <span class="cf">supprimerTache</span>(id) {
+  taches.value = taches.value.<span class="cf">filter</span>(t => t.id !== id)
+}
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="ck">&lt;template&gt;</span>
+  <span class="ck">&lt;div&gt;</span>
+    <span class="ck">&lt;h2&gt;</span>Tâches ({{ restantes }} restantes)<span class="ck">&lt;/h2&gt;</span>
+
+    <span class="ck">&lt;form</span> @submit.prevent=<span class="cs">"ajouterTache"</span><span class="ck">&gt;</span>
+      <span class="ck">&lt;input</span> <span class="cv">v-model</span>=<span class="cs">"nouvelleTache"</span> placeholder=<span class="cs">"Nouvelle tâche..."</span><span class="ck">&gt;</span>
+      <span class="ck">&lt;button</span> type=<span class="cs">"submit"</span><span class="ck">&gt;</span>Ajouter<span class="ck">&lt;/button&gt;</span>
+    <span class="ck">&lt;/form&gt;</span>
+
+    <span class="ck">&lt;p</span> <span class="cv">v-if</span>=<span class="cs">"taches.length === 0"</span><span class="ck">&gt;</span>Aucune tâche 🎉<span class="ck">&lt;/p&gt;</span>
+
+    <span class="ck">&lt;ul</span> <span class="cv">v-else</span><span class="ck">&gt;</span>
+      <span class="ck">&lt;li</span> <span class="cv">v-for</span>=<span class="cs">"tache in taches"</span> <span class="cv">:key</span>=<span class="cs">"tache.id"</span><span class="ck">&gt;</span>
+        <span class="ck">&lt;input</span> type=<span class="cs">"checkbox"</span> <span class="cv">v-model</span>=<span class="cs">"tache.fait"</span><span class="ck">&gt;</span>
+        <span class="ck">&lt;span</span> <span class="cv">:class</span>=<span class="cs">"{ 'fait': tache.fait }"</span><span class="ck">&gt;</span>{{ tache.texte }}<span class="ck">&lt;/span&gt;</span>
+        <span class="ck">&lt;button</span> @click=<span class="cs">"supprimerTache(tache.id)"</span><span class="ck">&gt;</span>✕<span class="ck">&lt;/button&gt;</span>
+      <span class="ck">&lt;/li&gt;</span>
+    <span class="ck">&lt;/ul&gt;</span>
+  <span class="ck">&lt;/div&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j5-reactivity')">← Réactivité</button>
+    <button class="btn btn-primary" onclick="goto('j5-ex')">Exercices J5 →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J5 EX -->
+<section class="section" id="j5-ex">
+  <div class="day-header">
+    <div class="day-num-big">5</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-red">Pratique</span></div>
+      <div class="day-title">Exercices — Jour 5</div>
+      <div class="day-sub">Compteur · Formulaire · Liste dynamique</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Exercices du jour</div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 1</span><span class="ex-title">Initialiser le projet</span><span class="ex-time">15 min</span></div>
+      <ul class="checklist">
+        <li>Créer un projet Vue 3 avec <code>npm create vue@latest</code>, activer Router + Pinia</li>
+        <li>Lancer le serveur de dev : <code>npm run dev</code></li>
+        <li>Supprimer le contenu de démonstration dans <code>App.vue</code> et <code>views/HomeView.vue</code></li>
+        <li>Vérifier que la page s'affiche vide sans erreur dans la console</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 2</span><span class="ex-title">Compteur avec min/max</span><span class="ex-time">25 min</span></div>
+      <p style="margin-bottom:10px">Crée <code>src/components/Compteur.vue</code> avec :</p>
+      <ul class="checklist">
+        <li>Affichage du compteur avec <code>ref(0)</code></li>
+        <li>Boutons + et − qui modifient la valeur</li>
+        <li>Computed <code>estAuMin</code> et <code>estAuMax</code> (limites : 0 et 10)</li>
+        <li>Boutons désactivés (<code>:disabled</code>) quand les limites sont atteintes</li>
+        <li>Couleur du chiffre qui change selon la valeur (rouge si 0, vert si 10)</li>
+        <li>Importer et utiliser ce composant dans <code>HomeView.vue</code></li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 3 — Principal</span><span class="ex-title">Liste de courses</span><span class="ex-time">50 min</span></div>
+      <p style="margin-bottom:10px">Crée <code>src/components/ListeCourses.vue</code> :</p>
+      <ul class="checklist">
+        <li>Champ de saisie + bouton "Ajouter" (ou touche Entrée)</li>
+        <li>Chaque item a un nom, une quantité (1 par défaut), et un état "acheté"</li>
+        <li>Checkbox pour marquer comme acheté (style barré)</li>
+        <li>Bouton pour supprimer un item</li>
+        <li>Computed : nombre d'items restants à acheter</li>
+        <li>Computed : liste filtrée (afficher "tous" / "restants" / "achetés" via v-if)</li>
+        <li>Bouton "Tout effacer" qui vide la liste (v-if pour l'afficher seulement si liste non vide)</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Bonus</span><span class="ex-title">Persistance localStorage</span><span class="ex-time">20 min</span></div>
+      <ul class="checklist">
+        <li>Utiliser <code>watch</code> pour sauvegarder la liste dans <code>localStorage</code> à chaque modification</li>
+        <li>Charger la liste depuis <code>localStorage</code> au démarrage</li>
+      </ul>
+      <div class="code-wrap" style="margin-top:12px">
+        <div class="code-top"><span class="code-fname">watch — exemple</span><span class="code-lang">Vue</span></div>
+        <pre><span class="ck">import</span> { watch } <span class="ck">from</span> <span class="cs">'vue'</span>
+
+watch(taches, (nouvelleValeur) => {
+  localStorage.<span class="cf">setItem</span>(<span class="cs">'courses'</span>, JSON.<span class="cf">stringify</span>(nouvelleValeur))
+}, { deep: <span class="cs">true</span> })</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j5-directives')">← Directives</button>
+    <button class="btn btn-primary" onclick="goto('j6-composants')">Jour 6 : Composants →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J6 COMPOSANTS -->
+<section class="section" id="j6-composants">
+  <div class="day-header">
+    <div class="day-num-big">6</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-green">Théorie</span></div>
+      <div class="day-title">Composants & SFC</div>
+      <div class="day-sub">Découper l'interface · Réutilisabilité · Organisation</div>
+      <div class="time-pills">
+        <div class="time-pill"><span class="tdot" style="background:var(--accent2)"></span>1h30 théorie</div>
+        <div class="time-pill"><span class="tdot" style="background:var(--accent)"></span>2h30 pratique</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Penser en composants</div>
+    <p>Un composant, c'est un bloc d'interface autonome et réutilisable. La règle : si tu répètes du HTML plus d'une fois, c'est un composant.</p>
+
+    <div class="schema">
+      <span class="highlight">App.vue</span>
+      ├── <span class="highlight">Header.vue</span>  (nav, logo)
+      ├── <span class="highlight">Sidebar.vue</span>
+      └── <span class="highlight">MainContent.vue</span>
+          ├── <span class="highlight">CardProduit.vue</span>  ×12
+          │   ├── <span class="highlight">Badge.vue</span>
+          │   └── <span class="highlight">BoutonAjout.vue</span>
+          └── <span class="highlight">Pagination.vue</span>
+    </div>
+
+    <h3>Créer et utiliser un composant</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/components/CarteUtilisateur.vue</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="cm">// Ce composant reçoit des données via les props</span>
+<span class="ck">const</span> <span class="cn">props</span> = <span class="cf">defineProps</span>({
+  nom: String,
+  email: String,
+  avatar: String
+})
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="ck">&lt;template&gt;</span>
+  <span class="ck">&lt;div</span> class=<span class="cs">"carte"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;img</span> <span class="cv">:src</span>=<span class="cs">"props.avatar"</span> <span class="cv">:alt</span>=<span class="cs">"props.nom"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;h3&gt;</span>{{ props.nom }}<span class="ck">&lt;/h3&gt;</span>
+    <span class="ck">&lt;p&gt;</span>{{ props.email }}<span class="ck">&lt;/p&gt;</span>
+  <span class="ck">&lt;/div&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Utiliser le composant dans une vue</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="ck">import</span> CarteUtilisateur <span class="ck">from</span> <span class="cs">'../components/CarteUtilisateur.vue'</span>
+
+<span class="ck">const</span> <span class="cn">utilisateurs</span> = [
+  { id: <span class="cs">1</span>, nom: <span class="cs">'Alice'</span>, email: <span class="cs">'alice@ex.com'</span>, avatar: <span class="cs">'/img/alice.jpg'</span> },
+  { id: <span class="cs">2</span>, nom: <span class="cs">'Bob'</span>, email: <span class="cs">'bob@ex.com'</span>, avatar: <span class="cs">'/img/bob.jpg'</span> }
+]
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="ck">&lt;template&gt;</span>
+  <span class="ck">&lt;div</span> class=<span class="cs">"grille"</span><span class="ck">&gt;</span>
+    <span class="cm">&lt;!-- Le composant est réutilisé pour chaque utilisateur --&gt;</span>
+    <span class="ck">&lt;CarteUtilisateur</span>
+      <span class="cv">v-for</span>=<span class="cs">"u in utilisateurs"</span>
+      <span class="cv">:key</span>=<span class="cs">"u.id"</span>
+      <span class="cv">:nom</span>=<span class="cs">"u.nom"</span>
+      <span class="cv">:email</span>=<span class="cs">"u.email"</span>
+      <span class="cv">:avatar</span>=<span class="cs">"u.avatar"</span>
+    <span class="ck">/&gt;</span>
+  <span class="ck">&lt;/div&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j5-ex')">← Exercices J5</button>
+    <button class="btn btn-primary" onclick="goto('j6-props')">Props & Emit →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J6 PROPS -->
+<section class="section" id="j6-props">
+  <div class="day-header">
+    <div class="day-num-big">6</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-green">Théorie</span></div>
+      <div class="day-title">Props & Emit</div>
+      <div class="day-sub">Communication parent → enfant et enfant → parent</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Flux de données entre composants</div>
+
+    <div class="schema">
+      Parent <span class="arrow">──── props ──→</span> <span class="highlight">Enfant</span>
+      Parent <span class="arrow">←─── emit ────</span> <span class="highlight">Enfant</span>
+    </div>
+
+    <h3>Props — données du parent vers l'enfant</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">BoutonAction.vue — props typées et validées</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="ck">const</span> <span class="cn">props</span> = <span class="cf">defineProps</span>({
+  <span class="cm">// Type simple</span>
+  label: {
+    type: String,
+    required: <span class="cs">true</span>
+  },
+  <span class="cm">// Avec valeur par défaut</span>
+  variante: {
+    type: String,
+    default: <span class="cs">'primaire'</span>,
+    validator: (v) => [<span class="cs">'primaire'</span>, <span class="cs">'secondaire'</span>, <span class="cs">'danger'</span>].<span class="cf">includes</span>(v)
+  },
+  desactive: {
+    type: Boolean,
+    default: <span class="cs">false</span>
+  }
+})
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="ck">&lt;template&gt;</span>
+  <span class="ck">&lt;button</span>
+    <span class="cv">:class</span>=<span class="cs">`btn btn--${props.variante}`</span>
+    <span class="cv">:disabled</span>=<span class="cs">"props.desactive"</span>
+  <span class="ck">&gt;</span>
+    {{ props.label }}
+  <span class="ck">&lt;/button&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+
+    <h3>Emit — événements de l'enfant vers le parent</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">FormulaireContact.vue — avec emit</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="ck">import</span> { reactive } <span class="ck">from</span> <span class="cs">'vue'</span>
+
+<span class="cm">// Déclarer les événements que ce composant peut émettre</span>
+<span class="ck">const</span> <span class="cn">emit</span> = <span class="cf">defineEmits</span>([<span class="cs">'soumettre'</span>, <span class="cs">'annuler'</span>])
+
+<span class="ck">const</span> <span class="cn">formulaire</span> = <span class="cf">reactive</span>({
+  nom: <span class="cs">''</span>,
+  email: <span class="cs">''</span>,
+  message: <span class="cs">''</span>
+})
+
+<span class="ck">function</span> <span class="cf">valider</span>() {
+  <span class="cm">// Émettre l'événement avec les données du formulaire</span>
+  <span class="cf">emit</span>(<span class="cs">'soumettre'</span>, { ...formulaire })
+}
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="ck">&lt;template&gt;</span>
+  <span class="ck">&lt;form</span> @submit.prevent=<span class="cs">"valider"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;input</span> <span class="cv">v-model</span>=<span class="cs">"formulaire.nom"</span> placeholder=<span class="cs">"Nom"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;input</span> <span class="cv">v-model</span>=<span class="cs">"formulaire.email"</span> type=<span class="cs">"email"</span> placeholder=<span class="cs">"Email"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;textarea</span> <span class="cv">v-model</span>=<span class="cs">"formulaire.message"</span><span class="ck">&gt;&lt;/textarea&gt;</span>
+    <span class="ck">&lt;button</span> type=<span class="cs">"submit"</span><span class="ck">&gt;</span>Envoyer<span class="ck">&lt;/button&gt;</span>
+    <span class="ck">&lt;button</span> type=<span class="cs">"button"</span> @click=<span class="cs">"emit('annuler')"</span><span class="ck">&gt;</span>Annuler<span class="ck">&lt;/button&gt;</span>
+  <span class="ck">&lt;/form&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Parent.vue — écouter les émissions</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="ck">import</span> FormulaireContact <span class="ck">from</span> <span class="cs">'./FormulaireContact.vue'</span>
+
+<span class="ck">function</span> <span class="cf">traiterSoumission</span>(donnees) {
+  console.<span class="cf">log</span>(<span class="cs">'Reçu du formulaire :'</span>, donnees)
+  <span class="cm">// Envoyer à une API, etc.</span>
+}
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="ck">&lt;template&gt;</span>
+  <span class="ck">&lt;FormulaireContact</span>
+    @soumettre=<span class="cs">"traiterSoumission"</span>
+    @annuler=<span class="cs">"() => console.log('annulé')"</span>
+  <span class="ck">/&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j6-composants')">← Composants</button>
+    <button class="btn btn-primary" onclick="goto('j6-slots')">Slots →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J6 SLOTS -->
+<section class="section" id="j6-slots">
+  <div class="day-header">
+    <div class="day-num-big">6</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-green">Théorie</span></div>
+      <div class="day-title">Slots</div>
+      <div class="day-sub">Injecter du contenu dans un composant</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Slots — le contenu flexible</div>
+    <p>Les slots permettent à un composant parent d'injecter du contenu HTML à l'intérieur d'un composant enfant. C'est comme un "trou" que le parent remplit.</p>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Carte.vue — composant avec slot</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">&lt;template&gt;</span>
+  <span class="ck">&lt;div</span> class=<span class="cs">"carte"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;header</span> class=<span class="cs">"carte-header"</span><span class="ck">&gt;</span>
+      <span class="cm">&lt;!-- Slot nommé "titre" --&gt;</span>
+      <span class="ck">&lt;slot</span> name=<span class="cs">"titre"</span><span class="ck">&gt;</span>Titre par défaut<span class="ck">&lt;/slot&gt;</span>
+    <span class="ck">&lt;/header&gt;</span>
+    <span class="ck">&lt;div</span> class=<span class="cs">"carte-corps"</span><span class="ck">&gt;</span>
+      <span class="cm">&lt;!-- Slot par défaut --&gt;</span>
+      <span class="ck">&lt;slot</span> <span class="ck">/&gt;</span>
+    <span class="ck">&lt;/div&gt;</span>
+    <span class="ck">&lt;footer</span> class=<span class="cs">"carte-pied"</span><span class="ck">&gt;</span>
+      <span class="ck">&lt;slot</span> name=<span class="cs">"actions"</span><span class="ck">&gt;&lt;/slot&gt;</span>
+    <span class="ck">&lt;/footer&gt;</span>
+  <span class="ck">&lt;/div&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Utilisation des slots nommés</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">&lt;Carte&gt;</span>
+  <span class="ck">&lt;template</span> #titre<span class="ck">&gt;</span>
+    <span class="ck">&lt;h2&gt;</span>Mon Profil <span class="ck">&lt;span</span> class=<span class="cs">"badge"</span><span class="ck">&gt;</span>Pro<span class="ck">&lt;/span&gt;&lt;/h2&gt;</span>
+  <span class="ck">&lt;/template&gt;</span>
+
+  <span class="cm">&lt;!-- Contenu par défaut --&gt;</span>
+  <span class="ck">&lt;p&gt;</span>Développeur Vue.js passionné.<span class="ck">&lt;/p&gt;</span>
+  <span class="ck">&lt;p&gt;</span>5 ans d'expérience.<span class="ck">&lt;/p&gt;</span>
+
+  <span class="ck">&lt;template</span> #actions<span class="ck">&gt;</span>
+    <span class="ck">&lt;button&gt;</span>Contacter<span class="ck">&lt;/button&gt;</span>
+    <span class="ck">&lt;button&gt;</span>Suivre<span class="ck">&lt;/button&gt;</span>
+  <span class="ck">&lt;/template&gt;</span>
+<span class="ck">&lt;/Carte&gt;</span></pre>
+    </div>
+
+    <div class="tip">
+      <strong>Slots vs Props — quand utiliser quoi ?</strong>
+      Props = données simples (texte, nombre, booléen). Slots = contenu HTML complexe que le parent décide. Règle : si tu as besoin de passer du HTML structuré avec des composants enfants, utilise un slot.
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j6-props')">← Props & Emit</button>
+    <button class="btn btn-primary" onclick="goto('j6-ex')">Exercices J6 →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J6 EX -->
+<section class="section" id="j6-ex">
+  <div class="day-header">
+    <div class="day-num-big">6</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-red">Pratique</span></div>
+      <div class="day-title">Exercices — Jour 6</div>
+      <div class="day-sub">Refactoriser en composants · Props · Emit · Slots</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Exercices du jour</div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 1</span><span class="ex-title">Composant Carte générique</span><span class="ex-time">30 min</span></div>
+      <ul class="checklist">
+        <li>Créer <code>src/components/Carte.vue</code> avec 3 slots : <code>titre</code>, default, <code>pied</code></li>
+        <li>Créer <code>src/components/CarteNote.vue</code> qui utilise <code>Carte</code> avec props : titre, contenu, date, couleur</li>
+        <li>Afficher 4 CarteNote dans HomeView avec des données différentes</li>
+        <li>La couleur de la carte doit changer le bandeau de gauche (border-left)</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 2</span><span class="ex-title">Refactoriser la liste de courses</span><span class="ex-time">40 min</span></div>
+      <p style="margin-bottom:10px">Reprends l'exercice du Jour 5 et découpe-le en composants :</p>
+      <ul class="checklist">
+        <li><code>FormulaireAjout.vue</code> : champ + bouton, émet un event <code>ajouter</code> avec le texte</li>
+        <li><code>ItemCourse.vue</code> : affiche un item, reçoit props <code>item</code>, émet <code>basculer</code> et <code>supprimer</code></li>
+        <li><code>ListeCourses.vue</code> : orchestre les deux composants enfants, gère l'état</li>
+        <li>Vérifier que tout fonctionne exactement comme avant</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 3</span><span class="ex-title">Composant Modal</span><span class="ex-time">30 min</span></div>
+      <ul class="checklist">
+        <li>Créer <code>src/components/Modal.vue</code> avec prop <code>visible</code> (Boolean) et event <code>fermer</code></li>
+        <li>Slot <code>titre</code> pour le header, slot default pour le contenu</li>
+        <li>Overlay sombre en arrière-plan, clic sur l'overlay → emit('fermer')</li>
+        <li>Utiliser <code>v-if="visible"</code> pour montrer/cacher la modale</li>
+        <li>Tester en ouvrant/fermant avec un bouton dans HomeView</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j6-slots')">← Slots</button>
+    <button class="btn btn-primary" onclick="goto('j7-router')">Jour 7 : Router →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J7 ROUTER -->
+<section class="section" id="j7-router">
+  <div class="day-header">
+    <div class="day-num-big">7</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-green">Théorie</span></div>
+      <div class="day-title">Vue Router</div>
+      <div class="day-sub">Navigation · Routes dynamiques · Guards</div>
+      <div class="time-pills">
+        <div class="time-pill"><span class="tdot" style="background:var(--accent2)"></span>1h30 théorie</div>
+        <div class="time-pill"><span class="tdot" style="background:var(--accent)"></span>2h30 pratique</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Routing côté client</div>
+    <p>Vue Router permet de naviguer entre "pages" sans recharger le navigateur. L'URL change, le composant affiché change, mais c'est toujours la même app.</p>
+
+    <h3>Configuration des routes</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/router/index.js</span><span class="code-lang">JS</span></div>
+      <pre><span class="ck">import</span> { createRouter, createWebHistory } <span class="ck">from</span> <span class="cs">'vue-router'</span>
+<span class="ck">import</span> AccueilView <span class="ck">from</span> <span class="cs">'../views/AccueilView.vue'</span>
+
+<span class="ck">const</span> <span class="cn">routes</span> = [
+  <span class="cm">// Route simple</span>
+  { path: <span class="cs">'/'</span>, name: <span class="cs">'accueil'</span>, component: AccueilView },
+
+  <span class="cm">// Lazy loading (chargé seulement à la visite)</span>
+  {
+    path: <span class="cs">'/notes'</span>,
+    name: <span class="cs">'notes'</span>,
+    component: () => <span class="ck">import</span>(<span class="cs">'../views/NotesView.vue'</span>)
+  },
+
+  <span class="cm">// Route dynamique (paramètre dans l'URL)</span>
+  {
+    path: <span class="cs">'/notes/:id'</span>,
+    name: <span class="cs">'note-detail'</span>,
+    component: () => <span class="ck">import</span>(<span class="cs">'../views/NoteDetailView.vue'</span>)
+  },
+
+  <span class="cm">// Route protégée avec meta</span>
+  {
+    path: <span class="cs">'/profil'</span>,
+    name: <span class="cs">'profil'</span>,
+    component: () => <span class="ck">import</span>(<span class="cs">'../views/ProfilView.vue'</span>),
+    meta: { requiresAuth: <span class="cs">true</span> }
+  },
+
+  <span class="cm">// Page 404</span>
+  { path: <span class="cs">'/:pathMatch(.*)*'</span>, name: <span class="cs">'not-found'</span>,
+    component: () => <span class="ck">import</span>(<span class="cs">'../views/NotFoundView.vue'</span>) }
+]
+
+<span class="ck">const</span> <span class="cn">router</span> = <span class="cf">createRouter</span>({
+  history: <span class="cf">createWebHistory</span>(),
+  routes
+})
+
+<span class="cm">// Navigation guard (protéger les routes)</span>
+router.<span class="cf">beforeEach</span>((to) => {
+  <span class="ck">const</span> <span class="cn">estConnecte</span> = localStorage.<span class="cf">getItem</span>(<span class="cs">'token'</span>)
+  <span class="ck">if</span> (to.meta.requiresAuth && !estConnecte) {
+    <span class="ck">return</span> { name: <span class="cs">'accueil'</span> }
+  }
+})
+
+<span class="ck">export default</span> router</pre>
+    </div>
+
+    <h3>Naviguer dans les templates et le script</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Navigation — exemples</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="ck">import</span> { useRouter, useRoute } <span class="ck">from</span> <span class="cs">'vue-router'</span>
+
+<span class="ck">const</span> <span class="cn">router</span> = <span class="cf">useRouter</span>()  <span class="cm">// pour naviguer</span>
+<span class="ck">const</span> <span class="cn">route</span> = <span class="cf">useRoute</span>()    <span class="cm">// pour lire l'URL courante</span>
+
+<span class="cm">// Lire un paramètre de l'URL : /notes/42 → route.params.id = '42'</span>
+console.<span class="cf">log</span>(route.params.id)
+
+<span class="cm">// Naviguer par code</span>
+<span class="ck">function</span> <span class="cf">allerALaNote</span>(id) {
+  router.<span class="cf">push</span>({ name: <span class="cs">'note-detail'</span>, params: { id } })
+}
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="ck">&lt;template&gt;</span>
+  <span class="cm">&lt;!-- Navigation dans le template --&gt;</span>
+  <span class="ck">&lt;nav&gt;</span>
+    <span class="ck">&lt;RouterLink</span> to=<span class="cs">"/"</span><span class="ck">&gt;</span>Accueil<span class="ck">&lt;/RouterLink&gt;</span>
+    <span class="ck">&lt;RouterLink</span> <span class="cv">:to</span>=<span class="cs">"{ name: 'notes' }"</span><span class="ck">&gt;</span>Notes<span class="ck">&lt;/RouterLink&gt;</span>
+    <span class="cm">&lt;!-- active-class ajouté auto sur le lien de la page courante --&gt;</span>
+  <span class="ck">&lt;/nav&gt;</span>
+
+  <span class="cm">&lt;!-- Où les vues sont rendues --&gt;</span>
+  <span class="ck">&lt;RouterView /&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j6-ex')">← Exercices J6</button>
+    <button class="btn btn-primary" onclick="goto('j7-pinia')">Pinia →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J7 PINIA -->
+<section class="section" id="j7-pinia">
+  <div class="day-header">
+    <div class="day-num-big">7</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-green">Théorie</span></div>
+      <div class="day-title">Pinia — État global</div>
+      <div class="day-sub">Partager des données entre tous les composants</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Le problème que Pinia résout</div>
+    <p>Quand deux composants "cousins" (pas parent-enfant) ont besoin des mêmes données, passer des props devient impossible. Pinia crée un "magasin" global accessible partout.</p>
+
+    <div class="schema">
+      <span class="highlight">Pinia Store</span>  ←──── accès direct ────→ <span class="highlight">N'importe quel composant</span>
+          (état, actions)
+    </div>
+
+    <h3>Créer un store</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/stores/notes.js</span><span class="code-lang">JS</span></div>
+      <pre><span class="ck">import</span> { defineStore } <span class="ck">from</span> <span class="cs">'pinia'</span>
+<span class="ck">import</span> { ref, computed } <span class="ck">from</span> <span class="cs">'vue'</span>
+
+<span class="cm">// Convention : useXxxStore</span>
+<span class="ck">export const</span> <span class="cf">useNotesStore</span> = <span class="cf">defineStore</span>(<span class="cs">'notes'</span>, () => {
+  <span class="cm">// STATE : les données</span>
+  <span class="ck">const</span> <span class="cn">notes</span> = <span class="cf">ref</span>([])
+  <span class="ck">const</span> <span class="cn">chargement</span> = <span class="cf">ref</span>(<span class="cs">false</span>)
+
+  <span class="cm">// GETTERS : données dérivées (comme computed)</span>
+  <span class="ck">const</span> <span class="cn">nombreNotes</span> = <span class="cf">computed</span>(() => notes.value.length)
+  <span class="ck">const</span> <span class="cn">notesFavorites</span> = <span class="cf">computed</span>(() =>
+    notes.value.<span class="cf">filter</span>(n => n.favori)
+  )
+
+  <span class="cm">// ACTIONS : fonctions qui modifient le state</span>
+  <span class="ck">function</span> <span class="cf">ajouterNote</span>(titre, contenu) {
+    notes.value.<span class="cf">push</span>({
+      id: Date.<span class="cf">now</span>(),
+      titre,
+      contenu,
+      favori: <span class="cs">false</span>,
+      creeLe: <span class="ck">new</span> Date().<span class="cf">toISOString</span>()
+    })
+  }
+
+  <span class="ck">function</span> <span class="cf">supprimerNote</span>(id) {
+    notes.value = notes.value.<span class="cf">filter</span>(n => n.id !== id)
+  }
+
+  <span class="ck">function</span> <span class="cf">basculerFavori</span>(id) {
+    <span class="ck">const</span> note = notes.value.<span class="cf">find</span>(n => n.id === id)
+    <span class="ck">if</span> (note) note.favori = !note.favori
+  }
+
+  <span class="ck">return</span> {
+    notes, chargement,
+    nombreNotes, notesFavorites,
+    ajouterNote, supprimerNote, basculerFavori
+  }
+})</pre>
+    </div>
+
+    <h3>Utiliser le store dans n'importe quel composant</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">N'importe quel composant .vue</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="ck">import</span> { useNotesStore } <span class="ck">from</span> <span class="cs">'../stores/notes'</span>
+
+<span class="cm">// Accéder au store — une seule instance partagée</span>
+<span class="ck">const</span> <span class="cn">notesStore</span> = <span class="cf">useNotesStore</span>()
+
+<span class="cm">// Utiliser l'état et les getters directement</span>
+<span class="cm">// notesStore.notes, notesStore.nombreNotes, etc.</span>
+
+<span class="cm">// Appeler les actions</span>
+<span class="ck">function</span> <span class="cf">creerNote</span>() {
+  notesStore.<span class="cf">ajouterNote</span>(<span class="cs">'Titre'</span>, <span class="cs">'Contenu...'</span>)
+}
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="ck">&lt;template&gt;</span>
+  <span class="ck">&lt;p&gt;</span>{{ notesStore.nombreNotes }} notes<span class="ck">&lt;/p&gt;</span>
+  <span class="ck">&lt;div</span> <span class="cv">v-for</span>=<span class="cs">"note in notesStore.notes"</span> <span class="cv">:key</span>=<span class="cs">"note.id"</span><span class="ck">&gt;</span>
+    {{ note.titre }}
+    <span class="ck">&lt;button</span> @click=<span class="cs">"notesStore.supprimerNote(note.id)"</span><span class="ck">&gt;</span>✕<span class="ck">&lt;/button&gt;</span>
+  <span class="ck">&lt;/div&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j7-router')">← Router</button>
+    <button class="btn btn-primary" onclick="goto('j7-ex')">Exercices J7 →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J7 EX -->
+<section class="section" id="j7-ex">
+  <div class="day-header">
+    <div class="day-num-big">7</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-red">Pratique</span></div>
+      <div class="day-title">Exercices — Jour 7</div>
+      <div class="day-sub">App multi-pages avec Router + Pinia</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Exercices du jour</div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 1</span><span class="ex-title">3 pages avec Router</span><span class="ex-time">30 min</span></div>
+      <ul class="checklist">
+        <li>Créer 3 vues : <code>AccueilView.vue</code>, <code>NotesView.vue</code>, <code>AProposView.vue</code></li>
+        <li>Configurer les routes dans <code>router/index.js</code></li>
+        <li>Créer un composant <code>NavBar.vue</code> avec des <code>RouterLink</code> vers les 3 pages</li>
+        <li>Styliser le lien actif avec <code>.router-link-active</code></li>
+        <li>Ajouter une page 404 qui redirige après 3 secondes</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 2 — Principal</span><span class="ex-title">Store de notes avec Pinia</span><span class="ex-time">60 min</span></div>
+      <ul class="checklist">
+        <li>Créer <code>src/stores/notes.js</code> avec : state (notes, filtreActif), getters (notesFiltrees, nombreNotes), actions (ajouter, supprimer, basculerFavori)</li>
+        <li>Dans <code>NotesView.vue</code> : afficher la liste depuis le store, formulaire d'ajout qui appelle l'action</li>
+        <li>Boutons de filtre : Toutes / Favorites (modifient <code>filtreActif</code> dans le store)</li>
+        <li>Le compteur dans la NavBar affiche <code>nombreNotes</code> depuis le même store</li>
+        <li>Bonus : route dynamique <code>/notes/:id</code> qui affiche le détail d'une note</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j7-pinia')">← Pinia</button>
+    <button class="btn btn-primary" onclick="goto('j8-lifecycle')">Jour 8 : API →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J8 LIFECYCLE -->
+<section class="section" id="j8-lifecycle">
+  <div class="day-header">
+    <div class="day-num-big">8</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-green">Théorie</span></div>
+      <div class="day-title">Lifecycle Hooks</div>
+      <div class="day-sub">Quand exécuter du code pendant la vie d'un composant</div>
+      <div class="time-pills">
+        <div class="time-pill"><span class="tdot" style="background:var(--accent2)"></span>1h30 théorie</div>
+        <div class="time-pill"><span class="tdot" style="background:var(--accent)"></span>2h30 pratique</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Cycle de vie d'un composant</div>
+
+    <div class="schema">
+      <span class="highlight">setup()</span>           → composant initialisé
+        ↓
+      <span class="highlight">onBeforeMount()</span>  → avant insertion dans le DOM
+        ↓
+      <span class="highlight">onMounted()</span>      → composant dans le DOM ✅ ← charger les données ici
+        ↓
+      <span class="highlight">onUpdated()</span>      → après chaque mise à jour
+        ↓
+      <span class="highlight">onUnmounted()</span>    → composant retiré du DOM → nettoyer ici
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Lifecycle hooks en pratique</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">import</span> { ref, onMounted, onUnmounted, watch } <span class="ck">from</span> <span class="cs">'vue'</span>
+
+<span class="ck">const</span> <span class="cn">donnees</span> = <span class="cf">ref</span>(null)
+<span class="ck">const</span> <span class="cn">chargement</span> = <span class="cf">ref</span>(<span class="cs">true</span>)
+<span class="ck">let</span> <span class="cn">intervalle</span> = null
+
+<span class="cm">// ✅ Charger les données une fois le composant monté</span>
+<span class="cf">onMounted</span>(<span class="ck">async</span> () => {
+  <span class="ck">try</span> {
+    <span class="ck">const</span> res = <span class="ck">await</span> <span class="cf">fetch</span>(<span class="cs">'/api/data'</span>)
+    donnees.value = <span class="ck">await</span> res.<span class="cf">json</span>()
+  } <span class="ck">finally</span> {
+    chargement.value = <span class="cs">false</span>
+  }
+
+  <span class="cm">// Démarrer un intervalle</span>
+  intervalle = <span class="cf">setInterval</span>(() => <span class="cf">rafraichir</span>(), <span class="cs">30000</span>)
+})
+
+<span class="cm">// 🧹 Nettoyer quand le composant disparaît</span>
+<span class="cf">onUnmounted</span>(() => {
+  <span class="cf">clearInterval</span>(intervalle)
+})
+
+<span class="cm">// 👁️ Réagir aux changements d'une valeur</span>
+<span class="ck">const</span> <span class="cn">route</span> = <span class="cf">useRoute</span>()
+<span class="cf">watch</span>(() => route.params.id, <span class="ck">async</span> (nouvelId) => {
+  <span class="cm">// Recharger si l'ID dans l'URL change</span>
+  <span class="ck">await</span> <span class="cf">chargerNote</span>(nouvelId)
+})</pre>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j7-ex')">← Exercices J7</button>
+    <button class="btn btn-primary" onclick="goto('j8-api')">Appels API →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J8 API -->
+<section class="section" id="j8-api">
+  <div class="day-header">
+    <div class="day-num-big">8</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-green">Théorie</span></div>
+      <div class="day-title">Appels API dans Vue</div>
+      <div class="day-sub">Composable useApi · Gestion loading/erreur · Pagination</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Pattern complet : données distantes dans Vue</div>
+
+    <h3>Composable — logique réutilisable</h3>
+    <p>Un composable est une fonction qui encapsule de la logique réactive (comme un hook React). Convention : préfixe <code>use</code>.</p>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/composables/useFetch.js</span><span class="code-lang">JS</span></div>
+      <pre><span class="ck">import</span> { ref } <span class="ck">from</span> <span class="cs">'vue'</span>
+
+<span class="ck">export function</span> <span class="cf">useFetch</span>(url) {
+  <span class="ck">const</span> <span class="cn">donnees</span> = <span class="cf">ref</span>(null)
+  <span class="ck">const</span> <span class="cn">chargement</span> = <span class="cf">ref</span>(<span class="cs">true</span>)
+  <span class="ck">const</span> <span class="cn">erreur</span> = <span class="cf">ref</span>(null)
+
+  <span class="ck">async function</span> <span class="cf">charger</span>() {
+    chargement.value = <span class="cs">true</span>
+    erreur.value = null
+    <span class="ck">try</span> {
+      <span class="ck">const</span> res = <span class="ck">await</span> <span class="cf">fetch</span>(url)
+      <span class="ck">if</span> (!res.ok) <span class="ck">throw new</span> Error(<span class="cs">`HTTP ${res.status}`</span>)
+      donnees.value = <span class="ck">await</span> res.<span class="cf">json</span>()
+    } <span class="ck">catch</span> (e) {
+      erreur.value = e.message
+    } <span class="ck">finally</span> {
+      chargement.value = <span class="cs">false</span>
+    }
+  }
+
+  <span class="cf">charger</span>()  <span class="cm">// lancer au démarrage</span>
+
+  <span class="ck">return</span> { donnees, chargement, erreur, recharger: charger }
+}</pre>
+    </div>
+
+    <h3>Utilisation dans un composant</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/views/UtilisateursView.vue</span><span class="code-lang">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="ck">import</span> { useFetch } <span class="ck">from</span> <span class="cs">'../composables/useFetch'</span>
+
+<span class="ck">const</span> { donnees: utilisateurs, chargement, erreur, recharger } =
+  <span class="cf">useFetch</span>(<span class="cs">'https://jsonplaceholder.typicode.com/users'</span>)
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="ck">&lt;template&gt;</span>
+  <span class="ck">&lt;div&gt;</span>
+    <span class="cm">&lt;!-- État de chargement --&gt;</span>
+    <span class="ck">&lt;div</span> <span class="cv">v-if</span>=<span class="cs">"chargement"</span> class=<span class="cs">"spinner"</span><span class="ck">&gt;</span>Chargement...<span class="ck">&lt;/div&gt;</span>
+
+    <span class="cm">&lt;!-- État d'erreur --&gt;</span>
+    <span class="ck">&lt;div</span> <span class="cv">v-else-if</span>=<span class="cs">"erreur"</span> class=<span class="cs">"erreur"</span><span class="ck">&gt;</span>
+      ❌ {{ erreur }}
+      <span class="ck">&lt;button</span> @click=<span class="cs">"recharger"</span><span class="ck">&gt;</span>Réessayer<span class="ck">&lt;/button&gt;</span>
+    <span class="ck">&lt;/div&gt;</span>
+
+    <span class="cm">&lt;!-- Données --&gt;</span>
+    <span class="ck">&lt;div</span> <span class="cv">v-else</span> class=<span class="cs">"grille"</span><span class="ck">&gt;</span>
+      <span class="ck">&lt;CarteUtilisateur</span>
+        <span class="cv">v-for</span>=<span class="cs">"u in utilisateurs"</span>
+        <span class="cv">:key</span>=<span class="cs">"u.id"</span>
+        <span class="cv">:utilisateur</span>=<span class="cs">"u"</span>
+      <span class="ck">/&gt;</span>
+    <span class="ck">&lt;/div&gt;</span>
+  <span class="ck">&lt;/div&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+
+    <div class="tip">
+      <strong>Pattern loading / erreur / données — toujours les 3</strong>
+      Chaque appel API doit gérer ces 3 états. C'est la différence entre une app amateur et une app sérieuse. Le composable <code>useFetch</code> que tu viens d'écrire le fait automatiquement pour toi.
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j8-lifecycle')">← Lifecycle</button>
+    <button class="btn btn-primary" onclick="goto('j8-ex')">Exercices J8 →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J8 EX -->
+<section class="section" id="j8-ex">
+  <div class="day-header">
+    <div class="day-num-big">8</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-red">Pratique</span></div>
+      <div class="day-title">Exercices — Jour 8</div>
+      <div class="day-sub">Consommer JSONPlaceholder · Composables · Pagination</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Exercices du jour</div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 1</span><span class="ex-title">Composable useFetch</span><span class="ex-time">25 min</span></div>
+      <ul class="checklist">
+        <li>Créer <code>src/composables/useFetch.js</code> comme dans le cours</li>
+        <li>L'utiliser dans une vue pour charger <code>/posts</code> de JSONPlaceholder</li>
+        <li>Afficher le skeleton (3 cartes grises animées) pendant le chargement</li>
+        <li>Afficher le message d'erreur avec bouton "Réessayer"</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 2 — Principal</span><span class="ex-title">Blog avec pagination</span><span class="ex-time">70 min</span></div>
+      <ul class="checklist">
+        <li>Page <code>PostsView.vue</code> : afficher les posts de JSONPlaceholder</li>
+        <li>10 posts par page, boutons Précédent / Suivant</li>
+        <li>Champ de recherche filtrant les posts par titre (côté client)</li>
+        <li>Clic sur un post → naviguer vers <code>/posts/:id</code></li>
+        <li><code>PostDetailView.vue</code> : charger le post + les commentaires (<code>/posts/:id/comments</code>)</li>
+        <li>Gestion du scroll en haut à chaque changement de page (<code>window.scrollTo(0,0)</code> dans onMounted)</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 3</span><span class="ex-title">Composable useSearch</span><span class="ex-time">25 min</span></div>
+      <ul class="checklist">
+        <li>Créer <code>src/composables/useSearch.js</code> qui prend une liste et une fonction de filtre</li>
+        <li>Retourne : recherche (ref), resultatsFiltres (computed)</li>
+        <li>Ajouter un délai (debounce 300ms) avant de filtrer</li>
+        <li>Utiliser ce composable dans PostsView</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j8-api')">← API dans Vue</button>
+    <button class="btn btn-primary" onclick="goto('j9-projet')">Jour 9 : Projet →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J9 PROJET -->
+<section class="section" id="j9-projet">
+  <div class="day-header">
+    <div class="day-num-big">9</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-red">Pratique</span><span class="tag tag-orange">Projet complet</span></div>
+      <div class="day-title">App "Carnet de notes"</div>
+      <div class="day-sub">Tout assembler : Composants + Router + Pinia + API mock</div>
+      <div class="time-pills">
+        <div class="time-pill"><span class="tdot" style="background:var(--accent)"></span>4h pratique</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Cahier des charges</div>
+    <p>Tu vas construire une app de gestion de notes complète avec toutes les compétences de la Phase 2. C'est ton projet de référence avant d'attaquer le backend.</p>
+
+    <h3>Fonctionnalités</h3>
+    <ul style="color:#9da8b5;font-size:14px;padding-left:1.25rem;margin-bottom:1.5rem;">
+      <li>Page d'accueil : liste de toutes les notes avec recherche</li>
+      <li>Page détail d'une note (route dynamique <code>/notes/:id</code>)</li>
+      <li>Créer une note (formulaire avec titre, contenu, catégorie, couleur)</li>
+      <li>Modifier une note existante</li>
+      <li>Supprimer avec confirmation (modale)</li>
+      <li>Système de favoris avec filtre</li>
+      <li>Compteur de notes dans la navbar</li>
+      <li>Persistance en localStorage</li>
+    </ul>
+
+    <h3>Architecture recommandée</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Structure du projet</span><span class="code-lang">bash</span></div>
+      <pre>src/
+├── components/
+│   ├── NavBar.vue
+│   ├── CarteNote.vue           <span class="cm">← affiche 1 note en résumé</span>
+│   ├── FormulaireNote.vue      <span class="cm">← formulaire créer/éditer</span>
+│   ├── Modal.vue               <span class="cm">← modale réutilisable</span>
+│   ├── BadgeCategorie.vue
+│   └── BoutonFiltre.vue
+├── views/
+│   ├── AccueilView.vue         <span class="cm">← liste + recherche</span>
+│   ├── NoteDetailView.vue      <span class="cm">← détail /notes/:id</span>
+│   ├── NouvelleNoteView.vue    <span class="cm">← formulaire création</span>
+│   └── EditerNoteView.vue      <span class="cm">← formulaire édition /notes/:id/edit</span>
+├── stores/
+│   └── notes.js                <span class="cm">← tout l'état de l'app</span>
+├── composables/
+│   └── useLocalStorage.js      <span class="cm">← persistance auto</span>
+└── router/index.js</pre>
+    </div>
+
+    <h3>Store Pinia complet</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/stores/notes.js</span><span class="code-lang">JS</span></div>
+      <pre><span class="ck">import</span> { defineStore } <span class="ck">from</span> <span class="cs">'pinia'</span>
+<span class="ck">import</span> { ref, computed, watch } <span class="ck">from</span> <span class="cs">'vue'</span>
+
+<span class="ck">export const</span> <span class="cf">useNotesStore</span> = <span class="cf">defineStore</span>(<span class="cs">'notes'</span>, () => {
+  <span class="cm">// Charger depuis localStorage au démarrage</span>
+  <span class="ck">const</span> <span class="cn">notesEnregistrees</span> = localStorage.<span class="cf">getItem</span>(<span class="cs">'mes-notes'</span>)
+  <span class="ck">const</span> <span class="cn">notes</span> = <span class="cf">ref</span>(notesEnregistrees ? JSON.<span class="cf">parse</span>(notesEnregistrees) : [])
+  <span class="ck">const</span> <span class="cn">filtreActif</span> = <span class="cf">ref</span>(<span class="cs">'toutes'</span>) <span class="cm">// 'toutes' | 'favorites'</span>
+  <span class="ck">const</span> <span class="cn">recherche</span> = <span class="cf">ref</span>(<span class="cs">''</span>)
+
+  <span class="cm">// Sauvegarder automatiquement</span>
+  <span class="cf">watch</span>(notes, (val) => {
+    localStorage.<span class="cf">setItem</span>(<span class="cs">'mes-notes'</span>, JSON.<span class="cf">stringify</span>(val))
+  }, { deep: <span class="cs">true</span> })
+
+  <span class="ck">const</span> <span class="cn">notesFiltrees</span> = <span class="cf">computed</span>(() => {
+    <span class="ck">let</span> <span class="cn">resultat</span> = notes.value
+    <span class="ck">if</span> (filtreActif.value === <span class="cs">'favorites'</span>)
+      resultat = resultat.<span class="cf">filter</span>(n => n.favori)
+    <span class="ck">if</span> (recherche.value)
+      resultat = resultat.<span class="cf">filter</span>(n =>
+        n.titre.<span class="cf">toLowerCase</span>().<span class="cf">includes</span>(recherche.value.<span class="cf">toLowerCase</span>())
+      )
+    <span class="ck">return</span> resultat.<span class="cf">sort</span>((a, b) => <span class="ck">new</span> Date(b.creeLe) - <span class="ck">new</span> Date(a.creeLe))
+  })
+
+  <span class="ck">function</span> <span class="cf">trouverParId</span>(id) {
+    <span class="ck">return</span> notes.value.<span class="cf">find</span>(n => n.id === id)
+  }
+
+  <span class="ck">function</span> <span class="cf">ajouterNote</span>(donnees) {
+    notes.value.<span class="cf">push</span>({
+      id: crypto.<span class="cf">randomUUID</span>(),
+      ...donnees,
+      favori: <span class="cs">false</span>,
+      creeLe: <span class="ck">new</span> Date().<span class="cf">toISOString</span>()
+    })
+  }
+
+  <span class="ck">function</span> <span class="cf">mettreAJour</span>(id, donnees) {
+    <span class="ck">const</span> idx = notes.value.<span class="cf">findIndex</span>(n => n.id === id)
+    <span class="ck">if</span> (idx >= <span class="cs">0</span>) notes.value[idx] = { ...notes.value[idx], ...donnees }
+  }
+
+  <span class="ck">function</span> <span class="cf">supprimer</span>(id) {
+    notes.value = notes.value.<span class="cf">filter</span>(n => n.id !== id)
+  }
+
+  <span class="ck">function</span> <span class="cf">basculerFavori</span>(id) {
+    <span class="ck">const</span> note = <span class="cf">trouverParId</span>(id)
+    <span class="ck">if</span> (note) note.favori = !note.favori
+  }
+
+  <span class="ck">return</span> {
+    notes, filtreActif, recherche, notesFiltrees,
+    trouverParId, ajouterNote, mettreAJour, supprimer, basculerFavori
+  }
+})</pre>
+    </div>
+
+    <h3>Étapes de développement recommandées</h3>
+    <ol style="color:#9da8b5;font-size:14px;padding-left:1.25rem;">
+      <li style="margin-bottom:8px"><strong style="color:var(--text)">Store + données fictives</strong> — Créer le store avec 3-4 notes en dur pour commencer</li>
+      <li style="margin-bottom:8px"><strong style="color:var(--text)">Router</strong> — Configurer les 4 routes, vérifier la navigation</li>
+      <li style="margin-bottom:8px"><strong style="color:var(--text)">AccueilView</strong> — Liste + recherche + filtres</li>
+      <li style="margin-bottom:8px"><strong style="color:var(--text)">NoteDetailView</strong> — Affichage + boutons Éditer/Supprimer</li>
+      <li style="margin-bottom:8px"><strong style="color:var(--text)">FormulaireNote</strong> — Création et édition (même composant)</li>
+      <li style="margin-bottom:8px"><strong style="color:var(--text)">Modal de confirmation</strong> — Avant suppression</li>
+      <li style="margin-bottom:8px"><strong style="color:var(--text)">localStorage</strong> — Persistance via watch</li>
+      <li><strong style="color:var(--text)">Polish CSS</strong> — Finir le design</li>
+    </ol>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j8-ex')">← Exercices J8</button>
+    <button class="btn btn-primary" onclick="goto('j9-deploy')">Déploiement →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J9 DEPLOY -->
+<section class="section" id="j9-deploy">
+  <div class="day-header">
+    <div class="day-num-big">9</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-red">Pratique</span></div>
+      <div class="day-title">Build & Déploiement</div>
+      <div class="day-sub">Compiler Vue pour la production · Vercel · Netlify</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Mettre en ligne ton app Vue</div>
+
+    <h3>Builder pour la production</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Terminal</span><span class="code-lang">bash</span></div>
+      <pre><span class="cm"># Builder l'app (crée le dossier dist/)</span>
+npm run build
+
+<span class="cm"># Prévisualiser le build localement</span>
+npm run preview
+
+<span class="cm"># Le dossier dist/ contient tout ce qui va en production</span>
+dist/
+├── index.html
+├── assets/
+│   ├── index-[hash].js    <span class="cm">← tout le JS minifié</span>
+│   └── index-[hash].css</pre>
+    </div>
+
+    <h3>Déployer sur Vercel (recommandé)</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Méthode 1 — CLI</span><span class="code-lang">bash</span></div>
+      <pre><span class="cm"># Installer la CLI Vercel</span>
+npm install -g vercel
+
+<span class="cm"># Dans le dossier du projet</span>
+vercel
+
+<span class="cm"># Répondre :
+# Framework: Vue.js (auto-détecté)
+# Build command: npm run build
+# Output directory: dist</span>
+
+<span class="cm"># Chaque git push sur main redéploie automatiquement</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Méthode 2 — GitHub → Vercel (interface web)</span><span class="code-lang">bash</span></div>
+      <pre><span class="cs">1.</span> Pousser ton projet sur GitHub
+<span class="cs">2.</span> Aller sur vercel.com → "Add New Project"
+<span class="cs">3.</span> Importer ton repo GitHub
+<span class="cs">4.</span> Vercel détecte Vue automatiquement
+<span class="cs">5.</span> Cliquer "Deploy" → URL publique en 1 minute</pre>
+    </div>
+
+    <div class="warn">
+      <strong>Problème avec le router en production</strong>
+      Vue Router en mode <code>history</code> nécessite une configuration serveur pour rediriger toutes les URLs vers <code>index.html</code>. Sur Vercel/Netlify, crée un fichier de configuration :
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">public/_redirects (Netlify)</span><span class="code-lang">bash</span></div>
+      <pre>/* /index.html 200</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">vercel.json (Vercel)</span><span class="code-lang">JSON</span></div>
+      <pre>{
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}</pre>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j9-projet')">← Projet</button>
+    <button class="btn btn-primary" onclick="goto('j9-bilan')">Bilan Phase 2 →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ J9 BILAN -->
+<section class="section" id="j9-bilan">
+  <div class="day-header">
+    <div class="day-num-big">✓</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-blue">Bilan</span></div>
+      <div class="day-title">Checklist Phase 2</div>
+      <div class="day-sub">Ce que tu maîtrises avant de passer au backend</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Compétences acquises</div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Vue 3 Bases</span><span class="ex-title">Jour 5</span></div>
+      <ul class="checklist">
+        <li>Créer un projet Vue 3 + Vite avec les bonnes options</li>
+        <li>Comprendre la structure d'un SFC (.vue)</li>
+        <li>Utiliser ref(), reactive(), computed()</li>
+        <li>Maîtriser v-if, v-for, v-bind, v-model, v-on</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Composants</span><span class="ex-title">Jour 6</span></div>
+      <ul class="checklist">
+        <li>Découper une interface en composants réutilisables</li>
+        <li>Passer des données parent → enfant via defineProps()</li>
+        <li>Remonter des événements enfant → parent via defineEmits()</li>
+        <li>Créer des layouts flexibles avec les slots</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Router + Pinia</span><span class="ex-title">Jour 7</span></div>
+      <ul class="checklist">
+        <li>Configurer Vue Router avec routes statiques et dynamiques</li>
+        <li>Naviguer via RouterLink et useRouter().push()</li>
+        <li>Créer et utiliser un store Pinia (state, getters, actions)</li>
+        <li>Partager l'état entre composants sans prop drilling</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">API & Lifecycle</span><span class="ex-title">Jour 8</span></div>
+      <ul class="checklist">
+        <li>Charger des données dans onMounted()</li>
+        <li>Écrire un composable useFetch() réutilisable</li>
+        <li>Gérer les 3 états : chargement / erreur / données</li>
+        <li>Réagir aux changements avec watch()</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Projet livrable</span><span class="ex-title">Jour 9</span></div>
+      <ul class="checklist">
+        <li>App de notes complète en ligne (URL publique)</li>
+        <li>Router multi-pages avec routes dynamiques</li>
+        <li>State management avec Pinia + persistance localStorage</li>
+        <li>CRUD complet : créer, lire, modifier, supprimer</li>
+        <li>Recherche et filtres fonctionnels</li>
+        <li>Code GitHub avec commits conventionnels propres</li>
+      </ul>
+    </div>
+
+    <div class="success">
+      <strong>Tu es prêt pour la Phase 3 !</strong>
+      Tu sais construire une vraie app Vue avec navigation, état global et appels API. La Phase 3 ajoute un vrai backend (Node.js + Express) et une base de données (Supabase ou SQLite). Tu vas connecter le frontend que tu maîtrises à une API que tu vas construire toi-même.
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j9-deploy')">← Déploiement</button>
+    <button class="btn btn-primary" disabled>Phase 3 : Backend →</button>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+const sections = document.querySelectorAll('.section');
+const navBtns = document.querySelectorAll('.nav-btn');
+const progFill = document.getElementById('prog-fill');
+const progPct = document.getElementById('prog-pct');
+
+const sectionIds = [
+  'j5-intro','j5-setup','j5-reactivity','j5-directives','j5-ex',
+  'j6-composants','j6-props','j6-slots','j6-ex',
+  'j7-router','j7-pinia','j7-ex',
+  'j8-lifecycle','j8-api','j8-ex',
+  'j9-projet','j9-deploy','j9-bilan'
+];
+
+function goto(id) {
+  sections.forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+
+  navBtns.forEach(btn => {
+    const fn = btn.getAttribute('onclick') || '';
+    btn.classList.toggle('active', fn.includes(`'${id}'`));
+  });
+
+  const idx = sectionIds.indexOf(id);
+  if (idx >= 0) {
+    const pct = Math.round(((idx + 1) / sectionIds.length) * 100);
+    progFill.style.width = pct + '%';
+    progPct.textContent = pct + '%';
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

@@ -3,314 +3,959 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LMS Pro</title>
-
+<title>14 Jours Dev — Formation Fullstack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --bg:        #f5f2eb;
+    --bg2:       #ede9e0;
+    --surface:   #ffffff;
+    --border:    #d8d2c4;
+    --border2:   #c8c0ae;
+    --ink:       #1a1714;
+    --ink2:      #3d3830;
+    --muted:     #8c8070;
+    --muted2:    #b0a898;
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial;
-}
+    /* Catégorie Vue */
+    --vue-hue:   160;
+    --vue:       #41b883;
+    --vue-bg:    #f0fdf6;
+    --vue-border:#b6e9d4;
+    --vue-dark:  #1a3d2e;
 
-body{
-  display:flex;
-  height:100vh;
-  background:#0b1220;
-  color:white;
-}
+    /* Phases */
+    --p1:   #e8d5b0;  --p1t:  #6b4c1e;  --p1b: #c4a870;
+    --p2:   #b0dde8;  --p2t:  #1e4d6b;  --p2b: #70b4c4;
+    --p3:   #d4b0e8;  --p3t:  #4d1e6b;  --p3b: #a470c4;
+    --p4:   #e8b0b0;  --p4t:  #6b1e1e;  --p4b: #c47070;
 
-/* SIDEBAR */
-.sidebar{
-  width:300px;
-  background:#111827;
-  padding:15px;
-  overflow-y:auto;
-  border-right:1px solid #1f2937;
-}
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 8px rgba(26,23,20,0.08), 0 0 0 1px rgba(26,23,20,0.06);
+    --shadow-hover: 0 8px 24px rgba(26,23,20,0.14), 0 0 0 1px rgba(26,23,20,0.08);
+  }
 
-.logo{
-  font-size:20px;
-  font-weight:bold;
-  margin-bottom:15px;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
 
-.folder{
-  margin-bottom:10px;
-}
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
 
-.folder-title{
-  background:#1f2937;
-  padding:10px;
-  border-radius:8px;
-  cursor:pointer;
-}
+  /* ── NOISE TEXTURE ───────────────────────────────── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
 
-.folder-title:hover{
-  background:#2563eb;
-}
+  /* ── HEADER ──────────────────────────────────────── */
+  header {
+    position: relative;
+    padding: 3rem 2rem 0;
+    text-align: center;
+    z-index: 1;
+  }
 
-.submenu{
-  display:none;
-  padding-left:10px;
-  margin-top:5px;
-}
+  .site-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 5px 14px;
+    border-radius: 100px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  .site-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--vue); animation: pulse 2s ease infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
 
-.submenu.active{
-  display:block;
-}
+  .site-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 400;
+    line-height: 1.0;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+  }
+  .site-title em {
+    font-style: italic;
+    color: var(--vue);
+  }
 
-.course{
-  background:#0f172a;
-  padding:8px;
-  margin:5px 0;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:14px;
-}
+  .site-desc {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 520px;
+    margin: 1rem auto 0;
+    font-weight: 300;
+  }
 
-.course:hover{
-  background:#2563eb;
-}
+  /* ── PROGRESS STRIP ──────────────────────────────── */
+  .progress-strip {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+    margin: 2.5rem auto 0;
+    padding: 1rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: fit-content;
+    box-shadow: var(--shadow);
+  }
+  .strip-day {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 500;
+    color: var(--muted2);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+  .strip-day:hover { transform: translateY(-2px); }
+  .strip-day.p1 { background: var(--p1); color: var(--p1t); border-color: var(--p1b); }
+  .strip-day.p2 { background: var(--p2); color: var(--p2t); border-color: var(--p2b); }
+  .strip-day.p3 { background: var(--p3); color: var(--p3t); border-color: var(--p3b); }
+  .strip-day.p4 { background: var(--p4); color: var(--p4t); border-color: var(--p4b); }
+  .strip-divider { width: 20px; height: 1px; background: var(--border2); flex-shrink: 0; }
+  .strip-label { font-size: 10px; color: var(--muted2); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
 
-/* CONTENT */
-.content{
-  flex:1;
-  padding:20px;
-  overflow-y:auto;
-}
+  /* ── MAIN LAYOUT ─────────────────────────────────── */
+  .container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+    position: relative;
+    z-index: 1;
+  }
 
-/* ARTICLE STYLE */
-.article{
-  background:white;
-  color:#111;
-  padding:30px;
-  border-radius:12px;
-  min-height:100%;
-  line-height:1.7;
-}
+  /* ── CATEGORY HEADER ─────────────────────────────── */
+  .category-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .category-left { display: flex; align-items: center; gap: 12px; }
+  .category-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .category-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .category-count {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+  .category-desc { font-size: 13px; color: var(--muted); max-width: 400px; }
 
-/* TOP BAR */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:15px;
-}
+  /* ── PHASES GRID ─────────────────────────────────── */
+  .phases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin-bottom: 3.5rem;
+  }
 
-.btn{
-  background:#2563eb;
-  padding:6px 12px;
-  border-radius:8px;
-  cursor:pointer;
-  font-size:13px;
-}
+  .phase-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.22s, transform 0.22s;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+  }
+  .phase-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-3px);
+  }
 
-.btn:hover{
-  background:#1d4ed8;
-}
+  .phase-card-stripe {
+    height: 5px;
+    width: 100%;
+  }
 
-/* PROGRESS */
-.progress{
-  font-size:12px;
-  opacity:0.7;
-  margin-top:5px;
-}
+  .phase-card-body { padding: 1.2rem 1.3rem 1.3rem; flex: 1; display: flex; flex-direction: column; }
 
+  .phase-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+  .phase-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--bg2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  .phase-days-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted2);
+  }
+
+  .phase-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .phase-subtitle { font-size: 12.5px; color: var(--muted); margin-bottom: 1rem; line-height: 1.5; }
+
+  .phase-topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: auto;
+    margin-bottom: 1rem;
+  }
+  .topic-chip {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: var(--bg2);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .phase-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    transition: all 0.15s;
+    margin-top: auto;
+  }
+  .phase-cta:hover { border-color: var(--border2); background: var(--bg); }
+  .phase-cta .arrow { font-size: 16px; transition: transform 0.15s; }
+  .phase-card:hover .phase-cta .arrow { transform: translateX(3px); }
+
+  /* Color variants */
+  .stripe-p1 { background: linear-gradient(90deg, var(--p1b), #d4b870); }
+  .stripe-p2 { background: linear-gradient(90deg, var(--p2b), #70c4d4); }
+  .stripe-p3 { background: linear-gradient(90deg, var(--p3b), #b470d4); }
+  .stripe-p4 { background: linear-gradient(90deg, var(--p4b), #d47070); }
+
+  .cta-p1 { background: var(--p1); border-color: var(--p1b) !important; color: var(--p1t) !important; }
+  .cta-p2 { background: var(--p2); border-color: var(--p2b) !important; color: var(--p2t) !important; }
+  .cta-p3 { background: var(--p3); border-color: var(--p3b) !important; color: var(--p3t) !important; }
+  .cta-p4 { background: var(--p4); border-color: var(--p4b) !important; color: var(--p4t) !important; }
+
+  /* ── SECTION SEPARATORS ──────────────────────────── */
+  .section-gap { margin-bottom: 4rem; }
+
+  /* ── QUICK ACCESS ────────────────────────────────── */
+  .quick-access {
+    margin-bottom: 4rem;
+  }
+  .qa-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    margin-top: 1rem;
+  }
+  .qa-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.15s;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .qa-item:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); border-color: var(--border2); }
+  .qa-day-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.08em; }
+  .qa-title { font-size: 13px; font-weight: 500; color: var(--ink2); line-height: 1.3; }
+  .qa-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: auto; margin-bottom: -2px; }
+
+  /* ── STATS ROW ───────────────────────────────────── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 4rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 2.8rem;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .stat-label { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ── SECTION LABELS ─────────────────────────────── */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted2);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── FOOTER ──────────────────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted2);
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── DECORATIVE BG ELEMENTS ──────────────────────── */
+  .bg-circle {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .bg-c1 { width: 500px; height: 500px; background: rgba(65,184,131,0.06); top: -100px; right: -100px; }
+  .bg-c2 { width: 400px; height: 400px; background: rgba(112,180,196,0.05); bottom: 0; left: -100px; }
+
+  /* ── MODAL OVERLAY ───────────────────────────────── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(26,23,20,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(26,23,20,0.2);
+    animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn { from { opacity:0; transform: translateY(16px) scale(0.97); } to { opacity:1; transform: translateY(0) scale(1); } }
+  .modal-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.4rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+  .modal-desc { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.6; }
+  .modal-phases { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.5rem; }
+  .modal-phase-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--ink2);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    background: var(--bg2);
+  }
+  .modal-phase-link:hover { border-color: var(--border2); background: var(--bg); transform: translateX(3px); }
+  .modal-phase-icon { font-size: 18px; }
+  .modal-phase-info { flex: 1; }
+  .modal-phase-name { font-weight: 500; color: var(--ink); }
+  .modal-phase-days { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .modal-close {
+    width: 100%; padding: 10px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--bg2); color: var(--muted);
+    font-family: 'Outfit', sans-serif; font-size: 13px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .modal-close:hover { background: var(--bg); color: var(--ink); }
+
+  /* ── RESPONSIVE ──────────────────────────────────── */
+  @media (max-width: 640px) {
+    header { padding: 2rem 1rem 0; }
+    .phases-grid { grid-template-columns: 1fr 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .progress-strip { flex-wrap: wrap; gap: 4px; }
+    .strip-label, .strip-divider { display: none; }
+  }
+  @media (max-width: 420px) {
+    .phases-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
-
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <div class="logo">🎓 LMS Pro</div>
-  <div id="sidebar"></div>
-</div>
+<div class="bg-circle bg-c1"></div>
+<div class="bg-circle bg-c2"></div>
 
-<!-- CONTENT -->
-<div class="content">
+<!-- ── HEADER ─────────────────────────────────────── -->
+<header>
+  <div class="site-eyebrow">
+    <span class="dot"></span>
+    Formation · 14 jours · Fullstack
+  </div>
+  <h1 class="site-title">
+    De zéro à<br><em>développeur</em>
+  </h1>
+  <p class="site-desc">
+    4 phases, 14 jours, une app fullstack déployée. HTML → CSS → JS → Vue 3 → Node.js → Base de données → Production.
+  </p>
 
-  <div class="topbar">
-    <div class="btn" onclick="goHome()">🏠 Accueil</div>
-    <div class="btn" onclick="toggleFav()">⭐ Favoris</div>
+  <!-- Timeline des 14 jours -->
+  <div class="progress-strip">
+    <span class="strip-label">J</span>
+    <div class="strip-day p1" title="Jour 1 — Environnement">1</div>
+    <div class="strip-day p1" title="Jour 2 — HTML & CSS">2</div>
+    <div class="strip-day p1" title="Jour 3 — JavaScript">3</div>
+    <div class="strip-day p1" title="Jour 4 — Mini-projet météo">4</div>
+    <div class="strip-divider"></div>
+    <div class="strip-day p2" title="Jour 5 — Vue 3 bases">5</div>
+    <div class="strip-day p2" title="Jour 6 — Composants">6</div>
+    <div class="strip-day p2" title="Jour 7 — Router & Pinia">7</div>
+    <div class="strip-day p2" title="Jour 8 — API & Lifecycle">8</div>
+    <div class="strip-day p2" title="Jour 9 — Projet carnet">9</div>
+    <div class="strip-divider"></div>
+    <div class="strip-day p3" title="Jour 10 — Express REST">10</div>
+    <div class="strip-day p3" title="Jour 11 — Base de données">11</div>
+    <div class="strip-day p3" title="Jour 12 — Authentification">12</div>
+    <div class="strip-divider"></div>
+    <div class="strip-day p4" title="Jour 13 — Assemblage Vue↔API">13</div>
+    <div class="strip-day p4" title="Jour 14 — Déploiement & Bilan">14</div>
+  </div>
+</header>
+
+<!-- ── MAIN ───────────────────────────────────────── -->
+<div class="container">
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num">14</div><div class="stat-label">Jours</div></div>
+    <div class="stat-card"><div class="stat-num">4</div><div class="stat-label">Phases</div></div>
+    <div class="stat-card"><div class="stat-num">40+</div><div class="stat-label">Exercices</div></div>
+    <div class="stat-card"><div class="stat-num">1</div><div class="stat-label">App déployée</div></div>
+    <div class="stat-card"><div class="stat-num">∞</div><div class="stat-label">Café ☕</div></div>
   </div>
 
-  <div id="article" class="article">
-    📘 Sélectionne un cours
+  <!-- ══ CATÉGORIE : VUE (FULLSTACK) ══════════════════ -->
+  <div class="section-gap">
+    <div class="category-header">
+      <div class="category-left">
+        <div class="category-icon" style="background:#f0fdf6; border:1px solid #b6e9d4;">🌿</div>
+        <div>
+          <div class="category-name">Vue · Fullstack</div>
+          <div class="category-count">4 phases · 14 jours · du terminal à la production</div>
+        </div>
+      </div>
+      <div class="category-desc">Le parcours complet pour construire et déployer une vraie app web avec Vue 3 + Node.js + base de données.</div>
+    </div>
+
+    <div class="phases-grid">
+
+      <!-- Phase 1 -->
+      <div class="phase-card" onclick="openModal('p1')">
+        <div class="phase-card-stripe stripe-p1"></div>
+        <div class="phase-card-body">
+          <div class="phase-top">
+            <span class="phase-num">Phase 01</span>
+            <span class="phase-days-badge">J1–J4</span>
+          </div>
+          <div class="phase-title">Fondations</div>
+          <div class="phase-subtitle">Environnement · HTML/CSS · JavaScript ES6+ · Git</div>
+          <div class="phase-topics">
+            <span class="topic-chip">Terminal</span>
+            <span class="topic-chip">Git</span>
+            <span class="topic-chip">Flexbox</span>
+            <span class="topic-chip">async/await</span>
+            <span class="topic-chip">fetch()</span>
+          </div>
+          <a href="phase1_formation.html" class="phase-cta cta-p1" onclick="event.stopPropagation()">
+            Ouvrir la formation <span class="arrow">→</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="phase-card" onclick="openModal('p2')">
+        <div class="phase-card-stripe stripe-p2"></div>
+        <div class="phase-card-body">
+          <div class="phase-top">
+            <span class="phase-num">Phase 02</span>
+            <span class="phase-days-badge">J5–J9</span>
+          </div>
+          <div class="phase-title">Vue 3</div>
+          <div class="phase-subtitle">Composition API · Router · Pinia · Composables</div>
+          <div class="phase-topics">
+            <span class="topic-chip">ref()</span>
+            <span class="topic-chip">v-for</span>
+            <span class="topic-chip">Props</span>
+            <span class="topic-chip">Pinia</span>
+            <span class="topic-chip">Router</span>
+          </div>
+          <a href="phase2_vue3_formation.html" class="phase-cta cta-p2" onclick="event.stopPropagation()">
+            Ouvrir la formation <span class="arrow">→</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="phase-card" onclick="openModal('p3')">
+        <div class="phase-card-stripe stripe-p3"></div>
+        <div class="phase-card-body">
+          <div class="phase-top">
+            <span class="phase-num">Phase 03</span>
+            <span class="phase-days-badge">J10–J12</span>
+          </div>
+          <div class="phase-title">Backend & DB</div>
+          <div class="phase-subtitle">Node.js · Express · Supabase / SQLite · JWT</div>
+          <div class="phase-topics">
+            <span class="topic-chip">REST API</span>
+            <span class="topic-chip">SQL</span>
+            <span class="topic-chip">Supabase</span>
+            <span class="topic-chip">bcrypt</span>
+            <span class="topic-chip">JWT</span>
+          </div>
+          <a href="phase3_backend_formation.html" class="phase-cta cta-p3" onclick="event.stopPropagation()">
+            Ouvrir la formation <span class="arrow">→</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Phase 4 -->
+      <div class="phase-card" onclick="openModal('p4')">
+        <div class="phase-card-stripe stripe-p4"></div>
+        <div class="phase-card-body">
+          <div class="phase-top">
+            <span class="phase-num">Phase 04</span>
+            <span class="phase-days-badge">J13–J14</span>
+          </div>
+          <div class="phase-title">Assemblage</div>
+          <div class="phase-subtitle">Vue ↔ API · Auth guards · Vercel · Railway</div>
+          <div class="phase-topics">
+            <span class="topic-chip">useApi()</span>
+            <span class="topic-chip">Guards</span>
+            <span class="topic-chip">Vercel</span>
+            <span class="topic-chip">Railway</span>
+            <span class="topic-chip">.env</span>
+          </div>
+          <a href="phase4_assemblage_formation.html" class="phase-cta cta-p4" onclick="event.stopPropagation()">
+            Ouvrir la formation <span class="arrow">→</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
   </div>
 
+  <!-- ══ ACCÈS RAPIDE PAR JOUR ═══════════════════════ -->
+  <div class="quick-access">
+    <div class="section-label">Accès rapide — par jour</div>
+    <div class="qa-grid">
+
+      <a href="phase1_formation.html#j1-env" class="qa-item">
+        <div class="qa-day-label">Jour 1</div>
+        <div class="qa-title">Environnement de dev</div>
+        <div class="qa-dot" style="background:var(--p1b)"></div>
+      </a>
+
+      <a href="phase1_formation.html#j2-html" class="qa-item">
+        <div class="qa-day-label">Jour 2</div>
+        <div class="qa-title">HTML5 & CSS moderne</div>
+        <div class="qa-dot" style="background:var(--p1b)"></div>
+      </a>
+
+      <a href="phase1_formation.html#j3-js" class="qa-item">
+        <div class="qa-day-label">Jour 3</div>
+        <div class="qa-title">JavaScript ES6+</div>
+        <div class="qa-dot" style="background:var(--p1b)"></div>
+      </a>
+
+      <a href="phase1_formation.html#j4-projet" class="qa-item">
+        <div class="qa-day-label">Jour 4</div>
+        <div class="qa-title">App météo complète</div>
+        <div class="qa-dot" style="background:var(--p1b)"></div>
+      </a>
+
+      <a href="phase2_vue3_formation.html#j5-intro" class="qa-item">
+        <div class="qa-day-label">Jour 5</div>
+        <div class="qa-title">Vue 3 — Les bases</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+
+      <a href="phase2_vue3_formation.html#j6-composants" class="qa-item">
+        <div class="qa-day-label">Jour 6</div>
+        <div class="qa-title">Composants & Props</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+
+      <a href="phase2_vue3_formation.html#j7-router" class="qa-item">
+        <div class="qa-day-label">Jour 7</div>
+        <div class="qa-title">Router & Pinia</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+
+      <a href="phase2_vue3_formation.html#j8-api" class="qa-item">
+        <div class="qa-day-label">Jour 8</div>
+        <div class="qa-title">Appels API dans Vue</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+
+      <a href="phase2_vue3_formation.html#j9-projet" class="qa-item">
+        <div class="qa-day-label">Jour 9</div>
+        <div class="qa-title">Carnet de notes</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+
+      <a href="phase3_backend_formation.html#j10-intro" class="qa-item">
+        <div class="qa-day-label">Jour 10</div>
+        <div class="qa-title">Express & REST API</div>
+        <div class="qa-dot" style="background:var(--p3b)"></div>
+      </a>
+
+      <a href="phase3_backend_formation.html#j11-choix" class="qa-item">
+        <div class="qa-day-label">Jour 11</div>
+        <div class="qa-title">Supabase / SQLite</div>
+        <div class="qa-dot" style="background:var(--p3b)"></div>
+      </a>
+
+      <a href="phase3_backend_formation.html#j12-concept" class="qa-item">
+        <div class="qa-day-label">Jour 12</div>
+        <div class="qa-title">JWT & Authentification</div>
+        <div class="qa-dot" style="background:var(--p3b)"></div>
+      </a>
+
+      <a href="phase4_assemblage_formation.html#j13-plan" class="qa-item">
+        <div class="qa-day-label">Jour 13</div>
+        <div class="qa-title">Connecter Vue ↔ API</div>
+        <div class="qa-dot" style="background:var(--p4b)"></div>
+      </a>
+
+      <a href="phase4_assemblage_formation.html#j14-backend" class="qa-item">
+        <div class="qa-day-label">Jour 14</div>
+        <div class="qa-title">Déploiement final</div>
+        <div class="qa-dot" style="background:var(--p4b)"></div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══ CATÉGORIE : CONCEPTS CLÉS ════════════════════ -->
+  <div class="section-gap">
+    <div class="category-header">
+      <div class="category-left">
+        <div class="category-icon" style="background:#fdf6f0; border:1px solid #e9d4b6;">📚</div>
+        <div>
+          <div class="category-name">Concepts clés</div>
+          <div class="category-count">Références rapides · retrouve n'importe quel sujet</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="qa-grid" style="grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));">
+      <a href="phase1_formation.html#j1-git" class="qa-item">
+        <div class="qa-day-label">Phase 1</div>
+        <div class="qa-title">Git & GitHub</div>
+        <div class="qa-dot" style="background:var(--p1b)"></div>
+      </a>
+      <a href="phase1_formation.html#j3-async" class="qa-item">
+        <div class="qa-day-label">Phase 1</div>
+        <div class="qa-title">async / await & fetch</div>
+        <div class="qa-dot" style="background:var(--p1b)"></div>
+      </a>
+      <a href="phase2_vue3_formation.html#j5-reactivity" class="qa-item">
+        <div class="qa-day-label">Phase 2</div>
+        <div class="qa-title">ref · reactive · computed</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+      <a href="phase2_vue3_formation.html#j5-directives" class="qa-item">
+        <div class="qa-day-label">Phase 2</div>
+        <div class="qa-title">Directives Vue</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+      <a href="phase2_vue3_formation.html#j6-props" class="qa-item">
+        <div class="qa-day-label">Phase 2</div>
+        <div class="qa-title">Props & Emit</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+      <a href="phase2_vue3_formation.html#j8-lifecycle" class="qa-item">
+        <div class="qa-day-label">Phase 2</div>
+        <div class="qa-title">Lifecycle Hooks</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+      <a href="phase3_backend_formation.html#j10-routes" class="qa-item">
+        <div class="qa-day-label">Phase 3</div>
+        <div class="qa-title">Routes CRUD Express</div>
+        <div class="qa-dot" style="background:var(--p3b)"></div>
+      </a>
+      <a href="phase3_backend_formation.html#j11-sql" class="qa-item">
+        <div class="qa-day-label">Phase 3</div>
+        <div class="qa-title">SQL essentiel</div>
+        <div class="qa-dot" style="background:var(--p3b)"></div>
+      </a>
+      <a href="phase3_backend_formation.html#j12-concept" class="qa-item">
+        <div class="qa-day-label">Phase 3</div>
+        <div class="qa-title">JWT & bcrypt</div>
+        <div class="qa-dot" style="background:var(--p3b)"></div>
+      </a>
+      <a href="phase4_assemblage_formation.html#j13-api-service" class="qa-item">
+        <div class="qa-day-label">Phase 4</div>
+        <div class="qa-title">Composable useApi()</div>
+        <div class="qa-dot" style="background:var(--p4b)"></div>
+      </a>
+      <a href="phase4_assemblage_formation.html#j13-guards" class="qa-item">
+        <div class="qa-day-label">Phase 4</div>
+        <div class="qa-title">Navigation Guards</div>
+        <div class="qa-dot" style="background:var(--p4b)"></div>
+      </a>
+      <a href="phase4_assemblage_formation.html#j14-debug" class="qa-item">
+        <div class="qa-day-label">Phase 4</div>
+        <div class="qa-title">Debugger en production</div>
+        <div class="qa-dot" style="background:var(--p4b)"></div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ CATÉGORIE : EXERCICES ════════════════════════ -->
+  <div class="section-gap">
+    <div class="category-header">
+      <div class="category-left">
+        <div class="category-icon" style="background:#fdf0f6; border:1px solid #e9b6d4;">✏️</div>
+        <div>
+          <div class="category-name">Exercices pratiques</div>
+          <div class="category-count">40+ exercices · accès direct</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="qa-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+      <a href="phase1_formation.html#j1-ex" class="qa-item">
+        <div class="qa-day-label">J1 · Exercices</div>
+        <div class="qa-title">Installation & Git (4 ex.)</div>
+        <div class="qa-dot" style="background:var(--p1b)"></div>
+      </a>
+      <a href="phase1_formation.html#j2-ex" class="qa-item">
+        <div class="qa-day-label">J2 · Exercices</div>
+        <div class="qa-title">Page de profil responsive</div>
+        <div class="qa-dot" style="background:var(--p1b)"></div>
+      </a>
+      <a href="phase1_formation.html#j3-ex" class="qa-item">
+        <div class="qa-day-label">J3 · Exercices</div>
+        <div class="qa-title">DOM + API (3 ex.)</div>
+        <div class="qa-dot" style="background:var(--p1b)"></div>
+      </a>
+      <a href="phase1_formation.html#j4-projet" class="qa-item">
+        <div class="qa-day-label">J4 · Projet</div>
+        <div class="qa-title">App météo Open-Meteo</div>
+        <div class="qa-dot" style="background:var(--p1b)"></div>
+      </a>
+      <a href="phase2_vue3_formation.html#j5-ex" class="qa-item">
+        <div class="qa-day-label">J5 · Exercices</div>
+        <div class="qa-title">Compteur & liste courses</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+      <a href="phase2_vue3_formation.html#j6-ex" class="qa-item">
+        <div class="qa-day-label">J6 · Exercices</div>
+        <div class="qa-title">Composants & Modal</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+      <a href="phase2_vue3_formation.html#j7-ex" class="qa-item">
+        <div class="qa-day-label">J7 · Exercices</div>
+        <div class="qa-title">Router + Store Pinia</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+      <a href="phase2_vue3_formation.html#j8-ex" class="qa-item">
+        <div class="qa-day-label">J8 · Exercices</div>
+        <div class="qa-title">Blog paginé + useFetch</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+      <a href="phase2_vue3_formation.html#j9-projet" class="qa-item">
+        <div class="qa-day-label">J9 · Projet</div>
+        <div class="qa-title">Carnet de notes complet</div>
+        <div class="qa-dot" style="background:var(--p2b)"></div>
+      </a>
+      <a href="phase3_backend_formation.html#j10-ex" class="qa-item">
+        <div class="qa-day-label">J10 · Exercices</div>
+        <div class="qa-title">API CRUD + Zod</div>
+        <div class="qa-dot" style="background:var(--p3b)"></div>
+      </a>
+      <a href="phase3_backend_formation.html#j11-ex" class="qa-item">
+        <div class="qa-day-label">J11 · Exercices</div>
+        <div class="qa-title">CRUD persisté + pagination</div>
+        <div class="qa-dot" style="background:var(--p3b)"></div>
+      </a>
+      <a href="phase3_backend_formation.html#j12-ex" class="qa-item">
+        <div class="qa-day-label">J12 · Exercices</div>
+        <div class="qa-title">Auth JWT + rate limit</div>
+        <div class="qa-dot" style="background:var(--p3b)"></div>
+      </a>
+      <a href="phase4_assemblage_formation.html#j13-ex" class="qa-item">
+        <div class="qa-day-label">J13 · Exercices</div>
+        <div class="qa-title">Grand assemblage (4 ex.)</div>
+        <div class="qa-dot" style="background:var(--p4b)"></div>
+      </a>
+      <a href="phase4_assemblage_formation.html#j14-ex" class="qa-item">
+        <div class="qa-day-label">J14 · Exercices</div>
+        <div class="qa-title">Déploiement + validation</div>
+        <div class="qa-dot" style="background:var(--p4b)"></div>
+      </a>
+    </div>
+  </div>
+
+</div><!-- end container -->
+
+<!-- ── FOOTER ─────────────────────────────────────── -->
+<footer>
+  14 Jours Dev · Formation Fullstack Vue · Tous les fichiers fonctionnent localement
+</footer>
+
+<!-- ── MODAL ──────────────────────────────────────── -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-desc" id="modal-desc"></div>
+    <div class="modal-phases" id="modal-phases"></div>
+    <button class="modal-close" onclick="closeModal()">Fermer</button>
+  </div>
 </div>
 
 <script>
-
-const username = "BlestDev";
-const repo = "formations";
-
-const folders = [
-  "Vue",
-  "react",
-  "nodejs",
-  "windev"
-];
-
-const sidebar = document.getElementById("sidebar");
-const article = document.getElementById("article");
-
-let currentCourse = null;
-
-/* FAVORIS */
-let favorites = JSON.parse(localStorage.getItem("fav") || "[]");
-
-/* LOAD SIDEBAR */
-async function loadSidebar(){
-
-  for(const folder of folders){
-
-    const folderDiv = document.createElement("div");
-    folderDiv.className = "folder";
-
-    const title = document.createElement("div");
-    title.className = "folder-title";
-    title.innerText = "📁 " + folder;
-
-    const submenu = document.createElement("div");
-    submenu.className = "submenu";
-
-    folderDiv.appendChild(title);
-    folderDiv.appendChild(submenu);
-    sidebar.appendChild(folderDiv);
-
-    title.onclick = () => {
-      submenu.classList.toggle("active");
-    };
-
-    try{
-
-      const url =
-      `https://api.github.com/repos/${username}/${repo}/contents/${folder}`;
-
-      const res = await fetch(url);
-
-      if(!res.ok){
-        submenu.innerHTML = "<div class='course'>❌ Dossier introuvable</div>";
-        continue;
-      }
-
-      const data = await res.json();
-
-      if(!Array.isArray(data)){
-        submenu.innerHTML = "<div class='course'>❌ Format invalide</div>";
-        continue;
-      }
-
-      const htmlFiles = data.filter(f =>
-        f.type === "file" &&
-        f.name &&
-        f.name.endsWith(".html")
-      );
-
-      if(htmlFiles.length === 0){
-        submenu.innerHTML = "<div class='course'>📭 Aucun cours</div>";
-        continue;
-      }
-
-      htmlFiles.forEach(file => {
-
-        const div = document.createElement("div");
-        div.className = "course";
-
-        div.innerHTML = `
-          📘 ${file.name.replace(".html","")}
-          <div class="progress">Progression: 0%</div>
-        `;
-
-        div.onclick = () => loadCourse(folder, file.name);
-
-        submenu.appendChild(div);
-
-      });
-
-    }catch(err){
-
-      console.error(err);
-
-      submenu.innerHTML =
-      "<div class='course'>⚠️ Erreur chargement API</div>";
-
-    }
-
+const phases = {
+  p1: {
+    title: '📦 Phase 1 — Fondations',
+    desc: '4 jours pour installer ton environnement, maîtriser HTML/CSS moderne, JavaScript ES6+, Git et construire ta première app météo.',
+    sections: [
+      { icon:'⚙️', name:'Jour 1 — Environnement & Git', days:'J1', href:'phase1_formation.html' },
+      { icon:'🎨', name:'Jour 2 — HTML5 & CSS', days:'J2', href:'phase1_formation.html' },
+      { icon:'⚡', name:'Jour 3 — JavaScript ES6+', days:'J3', href:'phase1_formation.html' },
+      { icon:'🌤️', name:'Jour 4 — App météo', days:'J4', href:'phase1_formation.html' },
+    ]
+  },
+  p2: {
+    title: '🌿 Phase 2 — Vue 3',
+    desc: '5 jours pour maîtriser Vue 3 Composition API, les composants, le router, Pinia et les appels API.',
+    sections: [
+      { icon:'⚡', name:'Jour 5 — Vue 3 bases & réactivité', days:'J5', href:'phase2_vue3_formation.html' },
+      { icon:'🧩', name:'Jour 6 — Composants, Props, Slots', days:'J6', href:'phase2_vue3_formation.html' },
+      { icon:'🔀', name:'Jour 7 — Router & Pinia', days:'J7', href:'phase2_vue3_formation.html' },
+      { icon:'🔗', name:'Jour 8 — API & Lifecycle', days:'J8', href:'phase2_vue3_formation.html' },
+      { icon:'📝', name:'Jour 9 — Carnet de notes', days:'J9', href:'phase2_vue3_formation.html' },
+    ]
+  },
+  p3: {
+    title: '🛠️ Phase 3 — Backend & DB',
+    desc: '3 jours pour construire une API REST avec Express, la connecter à Supabase ou SQLite, et implémenter l\'authentification JWT.',
+    sections: [
+      { icon:'🚀', name:'Jour 10 — Express & REST API', days:'J10', href:'phase3_backend_formation.html' },
+      { icon:'🗄️', name:'Jour 11 — Supabase / SQLite', days:'J11', href:'phase3_backend_formation.html' },
+      { icon:'🔐', name:'Jour 12 — JWT & Auth', days:'J12', href:'phase3_backend_formation.html' },
+    ]
+  },
+  p4: {
+    title: '🏁 Phase 4 — Assemblage',
+    desc: '2 jours pour connecter Vue à l\'API, protéger les pages avec des guards, et déployer l\'app complète en production.',
+    sections: [
+      { icon:'🔗', name:'Jour 13 — Vue ↔ API connectés', days:'J13', href:'phase4_assemblage_formation.html' },
+      { icon:'🌍', name:'Jour 14 — Déploiement & Bilan', days:'J14', href:'phase4_assemblage_formation.html' },
+    ]
   }
+};
 
+function openModal(phase) {
+  const p = phases[phase];
+  document.getElementById('modal-title').textContent = p.title;
+  document.getElementById('modal-desc').textContent = p.desc;
+  document.getElementById('modal-phases').innerHTML = p.sections.map(s => `
+    <a href="${s.href}" class="modal-phase-link">
+      <span class="modal-phase-icon">${s.icon}</span>
+      <div class="modal-phase-info">
+        <div class="modal-phase-name">${s.name}</div>
+        <div class="modal-phase-days">${s.days}</div>
+      </div>
+      <span style="color:var(--muted2)">→</span>
+    </a>
+  `).join('');
+  document.getElementById('modal').classList.add('open');
 }
 
-/* LOAD COURSE */
-async function loadCourse(folder, file){
-
-  currentCourse = file;
-
-  const url =
-  `https://${username}.github.io/${repo}/${folder}/${file}`;
-
-  article.innerHTML = "Chargement...";
-
-  const res = await fetch(url);
-  const html = await res.text();
-
-  const doc = new DOMParser().parseFromString(html,"text/html");
-
-  article.innerHTML = doc.body.innerHTML;
-
-  markProgress(file);
-
-}
-
-/* HOME */
-function goHome(){
-  article.innerHTML = "📘 Sélectionne un cours";
-}
-
-/* FAVORITES */
-function toggleFav(){
-
-  if(!currentCourse) return;
-
-  if(favorites.includes(currentCourse)){
-    favorites = favorites.filter(f => f !== currentCourse);
-  }else{
-    favorites.push(currentCourse);
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal')) {
+    document.getElementById('modal').classList.remove('open');
   }
-
-  localStorage.setItem("fav", JSON.stringify(favorites));
-
-  alert("Favoris mis à jour");
-
 }
 
-/* PROGRESS SYSTEM */
-function markProgress(file){
-
-  localStorage.setItem("progress-"+file, "100");
-  updateProgress(file);
-
-}
-
-function updateProgress(file){
-
-  const p = document.getElementById("p-"+file);
-  if(!p) return;
-
-  const value =
-  localStorage.getItem("progress-"+file) || "0";
-
-  p.innerText = "Progression: " + value + "%";
-
-}
-
-/* INIT */
-loadSidebar();
-
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 </script>
-
 </body>
 </html>

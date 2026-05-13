@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 4 — Assemblage Final · 14 Jours Dev</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a10;
+    --surface: #13131e;
+    --surface2: #1c1c2a;
+    --border: #2a2a3e;
+    --accent: #e0af68;
+    --accent2: #73daca;
+    --accent3: #bb9af7;
+    --accent4: #f7768e;
+    --text: #cdd6f4;
+    --muted: #6c7086;
+    --code-bg: #0d0d18;
+    --tag-gold: #2b2000;
+    --tag-gold-t: #e0af68;
+    --tag-teal: #001f1a;
+    --tag-teal-t: #73daca;
+    --tag-purple: #180d30;
+    --tag-purple-t: #bb9af7;
+    --tag-red: #2a0010;
+    --tag-red-t: #f7768e;
+    --tag-blue: #001a2e;
+    --tag-blue-t: #89b4fa;
+    --tag-green: #0d2010;
+    --tag-green-t: #a6e3a1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.7; }
+  .layout { display: grid; grid-template-columns: 270px 1fr; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar { background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+  .sidebar-logo { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+  .logo-eyebrow { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .logo-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 600; line-height: 1.2; }
+  .logo-title span { color: var(--accent); }
+  .logo-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .logo-finish { margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #2b2000, #001f1a); border: 1px solid var(--border); padding: 5px 12px; border-radius: 100px; font-size: 11px; color: var(--accent); }
+  .sidebar-scroll { flex: 1; overflow-y: auto; padding: 1rem; }
+  .nav-group { margin-bottom: 4px; }
+  .nav-group-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 8px 8px 4px; display: flex; align-items: center; gap: 6px; }
+  .nav-group-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .nav-btn { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 12.5px; color: var(--muted); background: none; border: none; text-align: left; font-family: 'DM Sans', sans-serif; transition: all 0.12s; }
+  .nav-btn:hover { background: var(--surface2); color: var(--text); }
+  .nav-btn.active { background: #2b2000; color: var(--accent); }
+  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+  .nav-btn.active .nav-dot { background: var(--accent); }
+  .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); }
+  .prog-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .prog-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent3), var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.4s ease; }
+
+  /* Main */
+  .main { padding: 3rem 4rem; max-width: 900px; }
+  .section { display: none; }
+  .section.active { display: block; animation: fadeUp 0.2s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Header */
+  .day-header { display: flex; gap: 1.5rem; margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+  .day-num { font-family: 'Fraunces', serif; font-size: 80px; font-weight: 300; font-style: italic; color: var(--border); line-height: 1; width: 90px; text-align: center; flex-shrink: 0; }
+  .day-info { flex: 1; }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .tag { font-size: 11px; padding: 3px 10px; border-radius: 100px; font-weight: 500; }
+  .tag-gold { background: var(--tag-gold); color: var(--tag-gold-t); }
+  .tag-teal { background: var(--tag-teal); color: var(--tag-teal-t); }
+  .tag-purple { background: var(--tag-purple); color: var(--tag-purple-t); }
+  .tag-red { background: var(--tag-red); color: var(--tag-red-t); }
+  .tag-blue { background: var(--tag-blue); color: var(--tag-blue-t); }
+  .tag-green { background: var(--tag-green); color: var(--tag-green-t); }
+  .day-title { font-family: 'Fraunces', serif; font-size: 34px; font-weight: 600; color: var(--text); line-height: 1.2; margin-bottom: 8px; }
+  .day-sub { color: var(--muted); font-size: 14px; }
+  .time-pills { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .time-pill { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); background: var(--surface2); padding: 4px 10px; border-radius: 100px; border: 1px solid var(--border); }
+  .tdot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* Content */
+  .block { margin-bottom: 2.5rem; }
+  .block-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
+  .block-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .block h3 { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600; color: var(--text); margin: 1.5rem 0 0.75rem; }
+  .block h3:first-child { margin-top: 0; }
+  .block p { color: #9399b2; font-size: 14px; margin-bottom: 0.75rem; line-height: 1.75; }
+  .block ul, .block ol { color: #9399b2; font-size: 14px; padding-left: 1.25rem; }
+  .block li { margin-bottom: 5px; }
+
+  /* Step cards */
+  .steps { display: flex; flex-direction: column; gap: 1px; margin: 1rem 0; }
+  .step { display: flex; gap: 1rem; align-items: flex-start; padding: 1rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 0; transition: border-color 0.15s; }
+  .step:first-child { border-radius: 10px 10px 0 0; }
+  .step:last-child { border-radius: 0 0 10px 10px; }
+  .step:only-child { border-radius: 10px; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--tag-gold); color: var(--accent); font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .step-body { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .step-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* Code */
+  .code-wrap { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 1rem 0; }
+  .code-top { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .code-fname { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .code-lang { font-size: 10px; padding: 2px 7px; border-radius: 4px; }
+  .lang-js { background: var(--tag-gold); color: var(--tag-gold-t); }
+  .lang-vue { background: var(--tag-teal); color: var(--tag-teal-t); }
+  .lang-bash { background: var(--tag-green); color: var(--tag-green-t); }
+  .lang-json { background: var(--tag-purple); color: var(--tag-purple-t); }
+  pre { font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.65; padding: 1.25rem 1.5rem; color: #cdd6f4; overflow-x: auto; white-space: pre; }
+  .cm { color: #45475a; font-style: italic; }
+  .ck { color: #f38ba8; }
+  .cs { color: #a6e3a1; }
+  .cn { color: #89dceb; }
+  .co { color: #e0af68; }
+  .cf { color: #89b4fa; }
+  .cv { color: #fab387; }
+
+  /* Ex */
+  .ex { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+  .ex-head { display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem; flex-wrap: wrap; }
+  .ex-badge { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); background: var(--tag-gold); padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+  .ex-title { font-weight: 500; font-size: 14px; color: var(--text); }
+  .ex-time { font-size: 12px; color: var(--muted); margin-left: auto; }
+  .ex p, .ex li { font-size: 13px; color: #9399b2; }
+  .ex ul { padding-left: 1.25rem; }
+  .ex li { margin-bottom: 4px; }
+  .checklist { list-style: none; padding: 0; margin-top: 10px; }
+  .checklist li { display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; font-size: 13px; color: #9399b2; }
+  .checklist li::before { content: '○'; color: var(--border); flex-shrink: 0; margin-top: 2px; font-size: 11px; }
+
+  /* Info boxes */
+  .tip { background: var(--tag-teal); border: 1px solid #0a3028; border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; font-size: 13px; color: var(--tag-teal-t); line-height: 1.6; }
+  .tip strong { color: var(--accent2); display: block; margin-bottom: 5px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .warn { background: #1c1000; border: 1px solid #4a3000; border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; font-size: 13px; color: var(--tag-gold-t); line-height: 1.6; }
+  .warn strong { color: var(--accent); display: block; margin-bottom: 5px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .success { background: var(--tag-green); border: 1px solid #1a4020; border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; font-size: 13px; color: var(--tag-green-t); line-height: 1.6; }
+  .success strong { color: #a6e3a1; display: block; margin-bottom: 5px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .celebrate { background: linear-gradient(135deg, #2b2000 0%, #001f1a 50%, #180d30 100%); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
+  .celebrate-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+  .celebrate p { color: #9399b2; font-size: 14px; margin-bottom: 0; }
+
+  code { font-family: 'DM Mono', monospace; font-size: 12px; background: var(--surface2); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+
+  /* Schema */
+  .schema { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin: 1rem 0; font-family: 'DM Mono', monospace; font-size: 12.5px; color: #6c7086; line-height: 2.2; }
+  .schema .hi { color: var(--accent2); }
+  .schema .hi2 { color: var(--accent); }
+  .schema .hi3 { color: var(--accent3); }
+  .schema .arr { color: #45475a; }
+
+  /* Deploy grid */
+  .deploy-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 1rem 0; }
+  .deploy-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+  .deploy-icon { font-size: 24px; margin-bottom: 8px; }
+  .deploy-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .deploy-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .deploy-tag { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 4px; margin-top: 6px; }
+
+  /* Final checklist */
+  .skill-group { margin-bottom: 1.5rem; }
+  .skill-group-title { font-size: 13px; font-weight: 500; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .skill-group-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .skill-list { display: flex; flex-direction: column; gap: 4px; }
+  .skill-item { display: flex; align-items: center; gap: 10px; padding: 6px 10px; background: var(--surface2); border-radius: 6px; font-size: 13px; color: #9399b2; }
+  .skill-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Nav footer */
+  .nav-footer { display: flex; gap: 12px; justify-content: space-between; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .btn { display: flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary { background: var(--accent); color: #0a0a10; border-color: var(--accent); }
+  .btn-primary:hover { background: #c89a58; border-color: #c89a58; color: #0a0a10; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); background: var(--surface); }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { height: auto; position: static; }
+    .main { padding: 2rem 1.5rem; }
+    .day-header { flex-direction: column; }
+    .day-num { font-size: 50px; width: auto; }
+    .deploy-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-eyebrow">Formation · 14 Jours Dev</div>
+    <div class="logo-title">Phase 4<br><span>Assemblage Final</span></div>
+    <div class="logo-sub">Vue ↔ API ↔ DB · Déploiement</div>
+    <div class="logo-finish">🏁 Jours 13 & 14 — La ligne d'arrivée</div>
+  </div>
+
+  <div class="sidebar-scroll">
+    <div class="nav-group">
+      <div class="nav-group-label">Jour 13 — Connecter Vue ↔ API</div>
+      <button class="nav-btn active" onclick="goto('j13-plan')"><span class="nav-dot"></span>Plan d'assemblage</button>
+      <button class="nav-btn" onclick="goto('j13-api-service')"><span class="nav-dot"></span>Service API dans Vue</button>
+      <button class="nav-btn" onclick="goto('j13-auth-store')"><span class="nav-dot"></span>Store d'authentification</button>
+      <button class="nav-btn" onclick="goto('j13-guards')"><span class="nav-dot"></span>Navigation guards</button>
+      <button class="nav-btn" onclick="goto('j13-crud')"><span class="nav-dot"></span>CRUD connecté à l'API</button>
+      <button class="nav-btn" onclick="goto('j13-ex')"><span class="nav-dot"></span>Exercices J13</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Jour 14 — Déploiement & Bilan</div>
+      <button class="nav-btn" onclick="goto('j14-env')"><span class="nav-dot"></span>Variables d'environnement</button>
+      <button class="nav-btn" onclick="goto('j14-backend')"><span class="nav-dot"></span>Déployer le backend</button>
+      <button class="nav-btn" onclick="goto('j14-frontend')"><span class="nav-dot"></span>Déployer le frontend</button>
+      <button class="nav-btn" onclick="goto('j14-debug')"><span class="nav-dot"></span>Debugger en production</button>
+      <button class="nav-btn" onclick="goto('j14-ex')"><span class="nav-dot"></span>Exercices J14</button>
+      <button class="nav-btn" onclick="goto('j14-bilan')"><span class="nav-dot"></span>🏆 Bilan 14 jours</button>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="prog-row"><span>Progression</span><span id="prog-pct">8%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:8%"></div></div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ══════════════════════════════════ J13 PLAN -->
+<section class="section active" id="j13-plan">
+  <div class="day-header">
+    <div class="day-num">13</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-gold">Pratique</span><span class="tag tag-teal">Intégration</span></div>
+      <div class="day-title">Plan d'assemblage</div>
+      <div class="day-sub">Vue parle à l'API · Auth dans Pinia · Pages protégées</div>
+      <div class="time-pills">
+        <div class="time-pill"><span class="tdot" style="background:var(--accent)"></span>4h pratique</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Architecture finale</div>
+
+    <div class="schema">
+<span class="hi">Vue (Frontend)</span>               <span class="hi2">Express (Backend)</span>        <span class="hi3">DB</span>
+
+stores/auth.js               middleware/auth.js
+  token (ref)         ──→    verifierToken()    ──→  utilisateurs
+  utilisateur (ref)   ←──    JWT payload
+  login()
+  logout()
+
+composables/useApi.js        routes/notes.js
+  get/post/put/delete ──→    GET /api/notes     ──→  notes
+    + header Bearer   ←──    JSON []
+
+router/index.js
+  beforeEach guard    ──→    (si pas de token → /login)
+  requiresAuth: true
+    </div>
+
+    <h3>Les 5 étapes du jour 13</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Créer le composable useApi()</div>
+          <div class="step-desc">Une fonction qui encapsule fetch() avec le token JWT dans le header. Toutes les requêtes passent par là.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Store Pinia d'authentification</div>
+          <div class="step-desc">Stocker le token et l'utilisateur. Actions : login(), logout(), checkAuth(). Persister le token dans localStorage.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Pages de connexion et d'inscription</div>
+          <div class="step-desc">Formulaires qui appellent les routes /api/auth/login et /api/auth/register, stockent le token dans le store.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Navigation guards</div>
+          <div class="step-desc">Protéger les routes Vue qui nécessitent d'être connecté. Rediriger vers /login si pas de token.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Remplacer les données mock par l'API</div>
+          <div class="step-desc">Brancher les vues notes sur les vraies routes /api/notes au lieu du localStorage ou des données en dur.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="warn">
+      <strong>Deux projets séparés, deux terminaux</strong>
+      Le frontend Vue tourne sur <code>localhost:5173</code>, le backend Express sur <code>localhost:3000</code>. Lance les deux en parallèle. CORS est configuré sur le backend pour autoriser le port 5173.
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" disabled>← Phase 3</button>
+    <button class="btn btn-primary" onclick="goto('j13-api-service')">Service API →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ J13 API SERVICE -->
+<section class="section" id="j13-api-service">
+  <div class="day-header">
+    <div class="day-num">13</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-gold">Pratique</span></div>
+      <div class="day-title">Service API dans Vue</div>
+      <div class="day-sub">Composable useApi · Headers JWT · Gestion erreurs centralisée</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Centraliser les appels API</div>
+    <p>Plutôt que d'écrire <code>fetch()</code> partout avec les mêmes headers, on crée un composable qui gère ça une fois pour toutes.</p>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/composables/useApi.js</span><span class="code-lang lang-js">JS</span></div>
+      <pre><span class="ck">import</span> { useAuthStore } <span class="ck">from</span> <span class="cs">'../stores/auth'</span>
+
+<span class="ck">const</span> <span class="cn">BASE_URL</span> = <span class="ck">import</span>.meta.env.VITE_API_URL || <span class="cs">'http://localhost:3000'</span>
+
+<span class="ck">export function</span> <span class="cf">useApi</span>() {
+  <span class="ck">const</span> <span class="cn">authStore</span> = <span class="cf">useAuthStore</span>()
+
+  <span class="ck">async function</span> <span class="cf">requete</span>(endpoint, options = {}) {
+    <span class="ck">const</span> <span class="cn">headers</span> = {
+      <span class="cs">'Content-Type'</span>: <span class="cs">'application/json'</span>,
+      ...options.headers
+    }
+
+    <span class="cm">// Ajouter le token JWT si disponible</span>
+    <span class="ck">if</span> (authStore.token) {
+      headers[<span class="cs">'Authorization'</span>] = <span class="cs">`Bearer ${authStore.token}`</span>
+    }
+
+    <span class="ck">const</span> <span class="cn">response</span> = <span class="ck">await</span> <span class="cf">fetch</span>(<span class="cs">`${BASE_URL}${endpoint}`</span>, {
+      ...options,
+      headers,
+      body: options.body ? JSON.<span class="cf">stringify</span>(options.body) : <span class="ck">undefined</span>
+    })
+
+    <span class="cm">// Token expiré → déconnecter et rediriger</span>
+    <span class="ck">if</span> (response.status === <span class="cs">401</span>) {
+      authStore.<span class="cf">logout</span>()
+      <span class="ck">throw new</span> Error(<span class="cs">'Session expirée, veuillez vous reconnecter'</span>)
+    }
+
+    <span class="ck">if</span> (!response.ok) {
+      <span class="ck">const</span> <span class="cn">erreur</span> = <span class="ck">await</span> response.<span class="cf">json</span>().<span class="cf">catch</span>(() => ({}))
+      <span class="ck">throw new</span> Error(erreur.erreur || <span class="cs">`Erreur ${response.status}`</span>)
+    }
+
+    <span class="cm">// 204 No Content → pas de corps JSON</span>
+    <span class="ck">if</span> (response.status === <span class="cs">204</span>) <span class="ck">return null</span>
+    <span class="ck">return</span> response.<span class="cf">json</span>()
+  }
+
+  <span class="cm">// Méthodes raccourcies</span>
+  <span class="ck">const</span> <span class="cn">api</span> = {
+    <span class="cf">get</span>: (url) => <span class="cf">requete</span>(url),
+    <span class="cf">post</span>: (url, body) => <span class="cf">requete</span>(url, { method: <span class="cs">'POST'</span>, body }),
+    <span class="cf">put</span>: (url, body) => <span class="cf">requete</span>(url, { method: <span class="cs">'PUT'</span>, body }),
+    <span class="cf">delete</span>: (url) => <span class="cf">requete</span>(url, { method: <span class="cs">'DELETE'</span> })
+  }
+
+  <span class="ck">return</span> { api }
+}</pre>
+    </div>
+
+    <h3>Utiliser useApi() dans une vue</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/views/NotesView.vue — extrait</span><span class="code-lang lang-vue">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="ck">import</span> { ref, onMounted } <span class="ck">from</span> <span class="cs">'vue'</span>
+<span class="ck">import</span> { useApi } <span class="ck">from</span> <span class="cs">'../composables/useApi'</span>
+
+<span class="ck">const</span> { api } = <span class="cf">useApi</span>()
+<span class="ck">const</span> <span class="cn">notes</span> = <span class="cf">ref</span>([])
+<span class="ck">const</span> <span class="cn">chargement</span> = <span class="cf">ref</span>(<span class="cs">true</span>)
+<span class="ck">const</span> <span class="cn">erreur</span> = <span class="cf">ref</span>(null)
+
+<span class="cf">onMounted</span>(<span class="ck">async</span> () => {
+  <span class="ck">try</span> {
+    notes.value = <span class="ck">await</span> api.<span class="cf">get</span>(<span class="cs">'/api/notes'</span>)
+  } <span class="ck">catch</span> (e) {
+    erreur.value = e.message
+  } <span class="ck">finally</span> {
+    chargement.value = <span class="cs">false</span>
+  }
+})
+
+<span class="ck">async function</span> <span class="cf">supprimerNote</span>(id) {
+  <span class="ck">await</span> api.<span class="cf">delete</span>(<span class="cs">`/api/notes/${id}`</span>)
+  notes.value = notes.value.<span class="cf">filter</span>(n => n.id !== id)
+}
+<span class="ck">&lt;/script&gt;</span></pre>
+    </div>
+
+    <div class="tip">
+      <strong>VITE_API_URL — variable d'environnement frontend</strong>
+      Dans Vue (Vite), les variables d'env doivent commencer par <code>VITE_</code>. Crée un fichier <code>.env</code> à la racine du projet Vue avec <code>VITE_API_URL=http://localhost:3000</code>. En production, tu changeras cette valeur pour l'URL de ton backend déployé.
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j13-plan')">← Plan</button>
+    <button class="btn btn-primary" onclick="goto('j13-auth-store')">Store auth →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ J13 AUTH STORE -->
+<section class="section" id="j13-auth-store">
+  <div class="day-header">
+    <div class="day-num">13</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-gold">Pratique</span></div>
+      <div class="day-title">Store d'authentification</div>
+      <div class="day-sub">Pinia · JWT persisté · Pages Login & Register</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Store Pinia pour l'auth</div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/stores/auth.js</span><span class="code-lang lang-js">JS</span></div>
+      <pre><span class="ck">import</span> { defineStore } <span class="ck">from</span> <span class="cs">'pinia'</span>
+<span class="ck">import</span> { ref, computed } <span class="ck">from</span> <span class="cs">'vue'</span>
+<span class="ck">import</span> { useRouter } <span class="ck">from</span> <span class="cs">'vue-router'</span>
+
+<span class="ck">const</span> <span class="cn">BASE_URL</span> = <span class="ck">import</span>.meta.env.VITE_API_URL || <span class="cs">'http://localhost:3000'</span>
+
+<span class="ck">export const</span> <span class="cf">useAuthStore</span> = <span class="cf">defineStore</span>(<span class="cs">'auth'</span>, () => {
+  <span class="cm">// Charger depuis localStorage au démarrage</span>
+  <span class="ck">const</span> <span class="cn">token</span> = <span class="cf">ref</span>(localStorage.<span class="cf">getItem</span>(<span class="cs">'token'</span>) || null)
+  <span class="ck">const</span> <span class="cn">utilisateur</span> = <span class="cf">ref</span>(
+    JSON.<span class="cf">parse</span>(localStorage.<span class="cf">getItem</span>(<span class="cs">'utilisateur'</span>) || <span class="cs">'null'</span>)
+  )
+  <span class="ck">const</span> <span class="cn">chargement</span> = <span class="cf">ref</span>(<span class="cs">false</span>)
+  <span class="ck">const</span> <span class="cn">erreur</span> = <span class="cf">ref</span>(null)
+
+  <span class="ck">const</span> <span class="cn">estConnecte</span> = <span class="cf">computed</span>(() => !!token.value)
+
+  <span class="ck">function</span> <span class="cf">_sauvegarder</span>(t, u) {
+    token.value = t
+    utilisateur.value = u
+    localStorage.<span class="cf">setItem</span>(<span class="cs">'token'</span>, t)
+    localStorage.<span class="cf">setItem</span>(<span class="cs">'utilisateur'</span>, JSON.<span class="cf">stringify</span>(u))
+  }
+
+  <span class="ck">async function</span> <span class="cf">login</span>(email, mdp) {
+    chargement.value = <span class="cs">true</span>
+    erreur.value = null
+    <span class="ck">try</span> {
+      <span class="ck">const</span> <span class="cn">res</span> = <span class="ck">await</span> <span class="cf">fetch</span>(<span class="cs">`${BASE_URL}/api/auth/login`</span>, {
+        method: <span class="cs">'POST'</span>,
+        headers: { <span class="cs">'Content-Type'</span>: <span class="cs">'application/json'</span> },
+        body: JSON.<span class="cf">stringify</span>({ email, mdp })
+      })
+      <span class="ck">const</span> <span class="cn">data</span> = <span class="ck">await</span> res.<span class="cf">json</span>()
+      <span class="ck">if</span> (!res.ok) <span class="ck">throw new</span> Error(data.erreur)
+      <span class="cf">_sauvegarder</span>(data.token, data.utilisateur)
+      <span class="ck">return true</span>
+    } <span class="ck">catch</span> (e) {
+      erreur.value = e.message
+      <span class="ck">return false</span>
+    } <span class="ck">finally</span> {
+      chargement.value = <span class="cs">false</span>
+    }
+  }
+
+  <span class="ck">async function</span> <span class="cf">register</span>(nom, email, mdp) {
+    chargement.value = <span class="cs">true</span>
+    erreur.value = null
+    <span class="ck">try</span> {
+      <span class="ck">const</span> <span class="cn">res</span> = <span class="ck">await</span> <span class="cf">fetch</span>(<span class="cs">`${BASE_URL}/api/auth/register`</span>, {
+        method: <span class="cs">'POST'</span>,
+        headers: { <span class="cs">'Content-Type'</span>: <span class="cs">'application/json'</span> },
+        body: JSON.<span class="cf">stringify</span>({ nom, email, mdp })
+      })
+      <span class="ck">const</span> <span class="cn">data</span> = <span class="ck">await</span> res.<span class="cf">json</span>()
+      <span class="ck">if</span> (!res.ok) <span class="ck">throw new</span> Error(data.erreur)
+      <span class="cf">_sauvegarder</span>(data.token, data.utilisateur)
+      <span class="ck">return true</span>
+    } <span class="ck">catch</span> (e) {
+      erreur.value = e.message
+      <span class="ck">return false</span>
+    } <span class="ck">finally</span> {
+      chargement.value = <span class="cs">false</span>
+    }
+  }
+
+  <span class="ck">function</span> <span class="cf">logout</span>() {
+    token.value = null
+    utilisateur.value = null
+    localStorage.<span class="cf">removeItem</span>(<span class="cs">'token'</span>)
+    localStorage.<span class="cf">removeItem</span>(<span class="cs">'utilisateur'</span>)
+  }
+
+  <span class="ck">return</span> { token, utilisateur, chargement, erreur, estConnecte, login, register, logout }
+})</pre>
+    </div>
+
+    <h3>Page de connexion</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/views/LoginView.vue</span><span class="code-lang lang-vue">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="ck">import</span> { reactive } <span class="ck">from</span> <span class="cs">'vue'</span>
+<span class="ck">import</span> { useRouter } <span class="ck">from</span> <span class="cs">'vue-router'</span>
+<span class="ck">import</span> { useAuthStore } <span class="ck">from</span> <span class="cs">'../stores/auth'</span>
+
+<span class="ck">const</span> <span class="cn">router</span> = <span class="cf">useRouter</span>()
+<span class="ck">const</span> <span class="cn">auth</span> = <span class="cf">useAuthStore</span>()
+
+<span class="ck">const</span> <span class="cn">form</span> = <span class="cf">reactive</span>({ email: <span class="cs">''</span>, mdp: <span class="cs">''</span> })
+
+<span class="ck">async function</span> <span class="cf">soumettre</span>() {
+  <span class="ck">const</span> <span class="cn">ok</span> = <span class="ck">await</span> auth.<span class="cf">login</span>(form.email, form.mdp)
+  <span class="ck">if</span> (ok) router.<span class="cf">push</span>({ name: <span class="cs">'notes'</span> })
+}
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="ck">&lt;template&gt;</span>
+  <span class="ck">&lt;div</span> class=<span class="cs">"page-auth"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;h1&gt;</span>Connexion<span class="ck">&lt;/h1&gt;</span>
+
+    <span class="ck">&lt;div</span> <span class="cv">v-if</span>=<span class="cs">"auth.erreur"</span> class=<span class="cs">"erreur"</span><span class="ck">&gt;</span>{{ auth.erreur }}<span class="ck">&lt;/div&gt;</span>
+
+    <span class="ck">&lt;form</span> @submit.prevent=<span class="cs">"soumettre"</span><span class="ck">&gt;</span>
+      <span class="ck">&lt;label&gt;</span>Email
+        <span class="ck">&lt;input</span> type=<span class="cs">"email"</span> <span class="cv">v-model</span>=<span class="cs">"form.email"</span> required<span class="ck">&gt;</span>
+      <span class="ck">&lt;/label&gt;</span>
+      <span class="ck">&lt;label&gt;</span>Mot de passe
+        <span class="ck">&lt;input</span> type=<span class="cs">"password"</span> <span class="cv">v-model</span>=<span class="cs">"form.mdp"</span> required<span class="ck">&gt;</span>
+      <span class="ck">&lt;/label&gt;</span>
+      <span class="ck">&lt;button</span> type=<span class="cs">"submit"</span> <span class="cv">:disabled</span>=<span class="cs">"auth.chargement"</span><span class="ck">&gt;</span>
+        {{ auth.chargement ? 'Connexion...' : 'Se connecter' }}
+      <span class="ck">&lt;/button&gt;</span>
+    <span class="ck">&lt;/form&gt;</span>
+
+    <span class="ck">&lt;RouterLink</span> to=<span class="cs">"/register"</span><span class="ck">&gt;</span>Pas encore de compte ? S'inscrire<span class="ck">&lt;/RouterLink&gt;</span>
+  <span class="ck">&lt;/div&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j13-api-service')">← Service API</button>
+    <button class="btn btn-primary" onclick="goto('j13-guards')">Navigation guards →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ J13 GUARDS -->
+<section class="section" id="j13-guards">
+  <div class="day-header">
+    <div class="day-num">13</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-gold">Pratique</span></div>
+      <div class="day-title">Navigation Guards</div>
+      <div class="day-sub">Protéger les pages Vue · Rediriger si non connecté</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Protéger les routes Vue</div>
+    <p>Un navigation guard s'exécute avant chaque changement de page. On l'utilise pour vérifier si l'utilisateur est connecté avant d'accéder aux pages protégées.</p>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/router/index.js — guards complets</span><span class="code-lang lang-js">JS</span></div>
+      <pre><span class="ck">import</span> { createRouter, createWebHistory } <span class="ck">from</span> <span class="cs">'vue-router'</span>
+<span class="ck">import</span> { useAuthStore } <span class="ck">from</span> <span class="cs">'../stores/auth'</span>
+
+<span class="ck">const</span> <span class="cn">routes</span> = [
+  <span class="cm">// Pages publiques (sans auth)</span>
+  { path: <span class="cs">'/'</span>, name: <span class="cs">'accueil'</span>,
+    component: () => <span class="ck">import</span>(<span class="cs">'../views/AccueilView.vue'</span>) },
+  { path: <span class="cs">'/login'</span>, name: <span class="cs">'login'</span>,
+    component: () => <span class="ck">import</span>(<span class="cs">'../views/LoginView.vue'</span>),
+    meta: { guestOnly: <span class="cs">true</span> } },     <span class="cm">// ← redirige si déjà connecté</span>
+  { path: <span class="cs">'/register'</span>, name: <span class="cs">'register'</span>,
+    component: () => <span class="ck">import</span>(<span class="cs">'../views/RegisterView.vue'</span>),
+    meta: { guestOnly: <span class="cs">true</span> } },
+
+  <span class="cm">// Pages protégées (auth requise)</span>
+  { path: <span class="cs">'/notes'</span>, name: <span class="cs">'notes'</span>,
+    component: () => <span class="ck">import</span>(<span class="cs">'../views/NotesView.vue'</span>),
+    meta: { requiresAuth: <span class="cs">true</span> } },
+  { path: <span class="cs">'/notes/nouvelle'</span>, name: <span class="cs">'nouvelle-note'</span>,
+    component: () => <span class="ck">import</span>(<span class="cs">'../views/NouvelleNoteView.vue'</span>),
+    meta: { requiresAuth: <span class="cs">true</span> } },
+  { path: <span class="cs">'/notes/:id'</span>, name: <span class="cs">'note-detail'</span>,
+    component: () => <span class="ck">import</span>(<span class="cs">'../views/NoteDetailView.vue'</span>),
+    meta: { requiresAuth: <span class="cs">true</span> } },
+  { path: <span class="cs">'/profil'</span>, name: <span class="cs">'profil'</span>,
+    component: () => <span class="ck">import</span>(<span class="cs">'../views/ProfilView.vue'</span>),
+    meta: { requiresAuth: <span class="cs">true</span> } },
+
+  { path: <span class="cs">'/:pathMatch(.*)*'</span>, name: <span class="cs">'not-found'</span>,
+    component: () => <span class="ck">import</span>(<span class="cs">'../views/NotFoundView.vue'</span>) }
+]
+
+<span class="ck">const</span> <span class="cn">router</span> = <span class="cf">createRouter</span>({
+  history: <span class="cf">createWebHistory</span>(),
+  routes
+})
+
+<span class="cm">// Guard global — s'exécute avant CHAQUE navigation</span>
+router.<span class="cf">beforeEach</span>((to) => {
+  <span class="ck">const</span> <span class="cn">auth</span> = <span class="cf">useAuthStore</span>()
+
+  <span class="cm">// Page protégée + pas connecté → login</span>
+  <span class="ck">if</span> (to.meta.requiresAuth && !auth.estConnecte) {
+    <span class="ck">return</span> { name: <span class="cs">'login'</span>, query: { redirect: to.fullPath } }
+  }
+
+  <span class="cm">// Page guest only + déjà connecté → notes</span>
+  <span class="ck">if</span> (to.meta.guestOnly && auth.estConnecte) {
+    <span class="ck">return</span> { name: <span class="cs">'notes'</span> }
+  }
+})
+
+<span class="ck">export default</span> router</pre>
+    </div>
+
+    <h3>Rediriger après connexion</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">LoginView.vue — redirect après login</span><span class="code-lang lang-vue">Vue</span></div>
+      <pre><span class="ck">import</span> { useRoute } <span class="ck">from</span> <span class="cs">'vue-router'</span>
+
+<span class="ck">const</span> <span class="cn">route</span> = <span class="cf">useRoute</span>()
+
+<span class="ck">async function</span> <span class="cf">soumettre</span>() {
+  <span class="ck">const</span> <span class="cn">ok</span> = <span class="ck">await</span> auth.<span class="cf">login</span>(form.email, form.mdp)
+  <span class="ck">if</span> (ok) {
+    <span class="cm">// Rediriger vers la page demandée avant la redirection vers /login</span>
+    <span class="ck">const</span> <span class="cn">destination</span> = route.query.redirect || <span class="cs">'/notes'</span>
+    router.<span class="cf">push</span>(destination)
+  }
+}</pre>
+    </div>
+
+    <h3>Bouton de déconnexion dans la navbar</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">NavBar.vue</span><span class="code-lang lang-vue">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="ck">import</span> { useAuthStore } <span class="ck">from</span> <span class="cs">'../stores/auth'</span>
+<span class="ck">import</span> { useRouter } <span class="ck">from</span> <span class="cs">'vue-router'</span>
+
+<span class="ck">const</span> <span class="cn">auth</span> = <span class="cf">useAuthStore</span>()
+<span class="ck">const</span> <span class="cn">router</span> = <span class="cf">useRouter</span>()
+
+<span class="ck">function</span> <span class="cf">seDeconnecter</span>() {
+  auth.<span class="cf">logout</span>()
+  router.<span class="cf">push</span>({ name: <span class="cs">'login'</span> })
+}
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="ck">&lt;template&gt;</span>
+  <span class="ck">&lt;nav&gt;</span>
+    <span class="ck">&lt;RouterLink</span> to=<span class="cs">"/"</span><span class="ck">&gt;</span>Logo<span class="ck">&lt;/RouterLink&gt;</span>
+
+    <span class="cm">&lt;!-- Liens conditionnels selon l'état de connexion --&gt;</span>
+    <span class="ck">&lt;template</span> <span class="cv">v-if</span>=<span class="cs">"auth.estConnecte"</span><span class="ck">&gt;</span>
+      <span class="ck">&lt;RouterLink</span> to=<span class="cs">"/notes"</span><span class="ck">&gt;</span>Mes notes<span class="ck">&lt;/RouterLink&gt;</span>
+      <span class="ck">&lt;span&gt;</span>{{ auth.utilisateur?.nom }}<span class="ck">&lt;/span&gt;</span>
+      <span class="ck">&lt;button</span> @click=<span class="cs">"seDeconnecter"</span><span class="ck">&gt;</span>Déconnexion<span class="ck">&lt;/button&gt;</span>
+    <span class="ck">&lt;/template&gt;</span>
+    <span class="ck">&lt;template</span> <span class="cv">v-else</span><span class="ck">&gt;</span>
+      <span class="ck">&lt;RouterLink</span> to=<span class="cs">"/login"</span><span class="ck">&gt;</span>Connexion<span class="ck">&lt;/RouterLink&gt;</span>
+      <span class="ck">&lt;RouterLink</span> to=<span class="cs">"/register"</span><span class="ck">&gt;</span>S'inscrire<span class="ck">&lt;/RouterLink&gt;</span>
+    <span class="ck">&lt;/template&gt;</span>
+  <span class="ck">&lt;/nav&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j13-auth-store')">← Store auth</button>
+    <button class="btn btn-primary" onclick="goto('j13-crud')">CRUD connecté →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ J13 CRUD -->
+<section class="section" id="j13-crud">
+  <div class="day-header">
+    <div class="day-num">13</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-gold">Pratique</span></div>
+      <div class="day-title">CRUD connecté à l'API</div>
+      <div class="day-sub">Remplacer les données mock · Créer · Modifier · Supprimer</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Store notes branché sur l'API</div>
+    <p>On adapte le store Pinia de la Phase 2 pour qu'il appelle l'API au lieu de gérer localStorage.</p>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/stores/notes.js — version API</span><span class="code-lang lang-js">JS</span></div>
+      <pre><span class="ck">import</span> { defineStore } <span class="ck">from</span> <span class="cs">'pinia'</span>
+<span class="ck">import</span> { ref, computed } <span class="ck">from</span> <span class="cs">'vue'</span>
+<span class="ck">import</span> { useApi } <span class="ck">from</span> <span class="cs">'../composables/useApi'</span>
+
+<span class="ck">export const</span> <span class="cf">useNotesStore</span> = <span class="cf">defineStore</span>(<span class="cs">'notes'</span>, () => {
+  <span class="ck">const</span> { api } = <span class="cf">useApi</span>()
+
+  <span class="ck">const</span> <span class="cn">notes</span> = <span class="cf">ref</span>([])
+  <span class="ck">const</span> <span class="cn">chargement</span> = <span class="cf">ref</span>(<span class="cs">false</span>)
+  <span class="ck">const</span> <span class="cn">erreur</span> = <span class="cf">ref</span>(null)
+  <span class="ck">const</span> <span class="cn">recherche</span> = <span class="cf">ref</span>(<span class="cs">''</span>)
+
+  <span class="ck">const</span> <span class="cn">notesFiltrees</span> = <span class="cf">computed</span>(() =>
+    notes.value.<span class="cf">filter</span>(n =>
+      n.titre.<span class="cf">toLowerCase</span>().<span class="cf">includes</span>(recherche.value.<span class="cf">toLowerCase</span>())
+    )
+  )
+
+  <span class="cm">// Charger toutes les notes depuis l'API</span>
+  <span class="ck">async function</span> <span class="cf">charger</span>() {
+    chargement.value = <span class="cs">true</span>
+    erreur.value = null
+    <span class="ck">try</span> {
+      notes.value = <span class="ck">await</span> api.<span class="cf">get</span>(<span class="cs">'/api/notes'</span>)
+    } <span class="ck">catch</span> (e) {
+      erreur.value = e.message
+    } <span class="ck">finally</span> {
+      chargement.value = <span class="cs">false</span>
+    }
+  }
+
+  <span class="ck">async function</span> <span class="cf">creer</span>(donnees) {
+    <span class="ck">const</span> <span class="cn">nouvelleNote</span> = <span class="ck">await</span> api.<span class="cf">post</span>(<span class="cs">'/api/notes'</span>, donnees)
+    notes.value.<span class="cf">unshift</span>(nouvelleNote)   <span class="cm">// ajouter en début de liste</span>
+    <span class="ck">return</span> nouvelleNote
+  }
+
+  <span class="ck">async function</span> <span class="cf">mettreAJour</span>(id, donnees) {
+    <span class="ck">const</span> <span class="cn">noteMAJ</span> = <span class="ck">await</span> api.<span class="cf">put</span>(<span class="cs">`/api/notes/${id}`</span>, donnees)
+    <span class="ck">const</span> <span class="cn">idx</span> = notes.value.<span class="cf">findIndex</span>(n => n.id === id)
+    <span class="ck">if</span> (idx >= <span class="cs">0</span>) notes.value[idx] = noteMAJ
+    <span class="ck">return</span> noteMAJ
+  }
+
+  <span class="ck">async function</span> <span class="cf">supprimer</span>(id) {
+    <span class="ck">await</span> api.<span class="cf">delete</span>(<span class="cs">`/api/notes/${id}`</span>)
+    notes.value = notes.value.<span class="cf">filter</span>(n => n.id !== id)
+  }
+
+  <span class="ck">return</span> {
+    notes, chargement, erreur, recherche,
+    notesFiltrees, charger, creer, mettreAJour, supprimer
+  }
+})</pre>
+    </div>
+
+    <h3>Vue de création de note</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">src/views/NouvelleNoteView.vue</span><span class="code-lang lang-vue">Vue</span></div>
+      <pre><span class="ck">&lt;script setup&gt;</span>
+<span class="ck">import</span> { reactive, ref } <span class="ck">from</span> <span class="cs">'vue'</span>
+<span class="ck">import</span> { useRouter } <span class="ck">from</span> <span class="cs">'vue-router'</span>
+<span class="ck">import</span> { useNotesStore } <span class="ck">from</span> <span class="cs">'../stores/notes'</span>
+
+<span class="ck">const</span> <span class="cn">router</span> = <span class="cf">useRouter</span>()
+<span class="ck">const</span> <span class="cn">store</span> = <span class="cf">useNotesStore</span>()
+<span class="ck">const</span> <span class="cn">erreur</span> = <span class="cf">ref</span>(null)
+
+<span class="ck">const</span> <span class="cn">form</span> = <span class="cf">reactive</span>({
+  titre: <span class="cs">''</span>, contenu: <span class="cs">''</span>, categorie: <span class="cs">'general'</span>
+})
+
+<span class="ck">async function</span> <span class="cf">soumettre</span>() {
+  erreur.value = null
+  <span class="ck">try</span> {
+    <span class="ck">const</span> <span class="cn">note</span> = <span class="ck">await</span> store.<span class="cf">creer</span>({ ...form })
+    router.<span class="cf">push</span>({ name: <span class="cs">'note-detail'</span>, params: { id: note.id } })
+  } <span class="ck">catch</span> (e) {
+    erreur.value = e.message
+  }
+}
+<span class="ck">&lt;/script&gt;</span>
+
+<span class="ck">&lt;template&gt;</span>
+  <span class="ck">&lt;div&gt;</span>
+    <span class="ck">&lt;h1&gt;</span>Nouvelle note<span class="ck">&lt;/h1&gt;</span>
+    <span class="ck">&lt;p</span> <span class="cv">v-if</span>=<span class="cs">"erreur"</span> class=<span class="cs">"erreur"</span><span class="ck">&gt;</span>{{ erreur }}<span class="ck">&lt;/p&gt;</span>
+    <span class="ck">&lt;form</span> @submit.prevent=<span class="cs">"soumettre"</span><span class="ck">&gt;</span>
+      <span class="ck">&lt;input</span> <span class="cv">v-model</span>=<span class="cs">"form.titre"</span> placeholder=<span class="cs">"Titre"</span> required<span class="ck">&gt;</span>
+      <span class="ck">&lt;textarea</span> <span class="cv">v-model</span>=<span class="cs">"form.contenu"</span> placeholder=<span class="cs">"Contenu..."</span><span class="ck">&gt;&lt;/textarea&gt;</span>
+      <span class="ck">&lt;select</span> <span class="cv">v-model</span>=<span class="cs">"form.categorie"</span><span class="ck">&gt;</span>
+        <span class="ck">&lt;option</span> value=<span class="cs">"general"</span><span class="ck">&gt;</span>Général<span class="ck">&lt;/option&gt;</span>
+        <span class="ck">&lt;option</span> value=<span class="cs">"travail"</span><span class="ck">&gt;</span>Travail<span class="ck">&lt;/option&gt;</span>
+        <span class="ck">&lt;option</span> value=<span class="cs">"perso"</span><span class="ck">&gt;</span>Personnel<span class="ck">&lt;/option&gt;</span>
+      <span class="ck">&lt;/select&gt;</span>
+      <span class="ck">&lt;button</span> type=<span class="cs">"submit"</span><span class="ck">&gt;</span>Créer<span class="ck">&lt;/button&gt;</span>
+    <span class="ck">&lt;/form&gt;</span>
+  <span class="ck">&lt;/div&gt;</span>
+<span class="ck">&lt;/template&gt;</span></pre>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j13-guards')">← Guards</button>
+    <button class="btn btn-primary" onclick="goto('j13-ex')">Exercices J13 →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ J13 EX -->
+<section class="section" id="j13-ex">
+  <div class="day-header">
+    <div class="day-num">13</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-red">Pratique</span></div>
+      <div class="day-title">Exercices — Jour 13</div>
+      <div class="day-sub">Assembler le frontend et le backend en une app complète</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Le grand assemblage</div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 1</span><span class="ex-title">Composable useApi + store auth</span><span class="ex-time">45 min</span></div>
+      <ul class="checklist">
+        <li>Créer <code>src/composables/useApi.js</code> comme dans le cours</li>
+        <li>Créer <code>src/stores/auth.js</code> avec login, logout, register, persistance localStorage</li>
+        <li>Créer <code>.env</code> dans le projet Vue avec <code>VITE_API_URL=http://localhost:3000</code></li>
+        <li>Tester : <code>console.log(authStore.estConnecte)</code> dans une vue → <code>false</code> au départ</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 2</span><span class="ex-title">Pages Login & Register</span><span class="ex-time">40 min</span></div>
+      <ul class="checklist">
+        <li>Créer <code>LoginView.vue</code> : formulaire email + mdp, appelle <code>auth.login()</code>, redirige vers /notes si succès</li>
+        <li>Créer <code>RegisterView.vue</code> : formulaire nom + email + mdp, appelle <code>auth.register()</code></li>
+        <li>Afficher l'erreur du store si la connexion échoue</li>
+        <li>Désactiver le bouton pendant <code>auth.chargement</code></li>
+        <li>Ajouter les routes dans le router avec <code>meta: { guestOnly: true }</code></li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 3 — Principal</span><span class="ex-title">Notes CRUD complet connecté</span><span class="ex-time">75 min</span></div>
+      <ul class="checklist">
+        <li>Adapter <code>stores/notes.js</code> pour utiliser useApi() au lieu de localStorage</li>
+        <li>Appeler <code>store.charger()</code> dans <code>onMounted</code> de NotesView</li>
+        <li>Tester la création de note → apparaît en haut de la liste sans rechargement</li>
+        <li>Tester la suppression avec modale de confirmation</li>
+        <li>Tester la modification : formulaire pré-rempli avec les données existantes</li>
+        <li>Protéger toutes les routes notes avec <code>meta: { requiresAuth: true }</code></li>
+        <li>Navigation guard : accéder à /notes sans être connecté → redirige vers /login</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 4</span><span class="ex-title">Navbar dynamique + profil</span><span class="ex-time">20 min</span></div>
+      <ul class="checklist">
+        <li>Navbar affiche les liens selon <code>auth.estConnecte</code></li>
+        <li>Afficher le nom de l'utilisateur connecté</li>
+        <li>Bouton déconnexion → <code>auth.logout()</code> + redirection vers /login</li>
+        <li>Page <code>/profil</code> qui affiche les infos de l'utilisateur via <code>auth.utilisateur</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j13-crud')">← CRUD</button>
+    <button class="btn btn-primary" onclick="goto('j14-env')">Jour 14 : Déploiement →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ J14 ENV -->
+<section class="section" id="j14-env">
+  <div class="day-header">
+    <div class="day-num">14</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-teal">Déploiement</span></div>
+      <div class="day-title">Variables d'environnement</div>
+      <div class="day-sub">Séparer config locale et production · .env.production</div>
+      <div class="time-pills">
+        <div class="time-pill"><span class="tdot" style="background:var(--accent)"></span>4h pratique</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Gérer les environnements</div>
+    <p>En local tu utilises <code>localhost</code>. En production, tu as de vraies URLs. Les variables d'environnement permettent de changer ces valeurs sans modifier le code.</p>
+
+    <h3>Frontend Vue (Vite)</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Fichiers .env dans le projet Vue</span><span class="code-lang lang-bash">bash</span></div>
+      <pre><span class="cm"># .env — local (gitignore)</span>
+VITE_API_URL=http://localhost:3000
+
+<span class="cm"># .env.production — production (peut être commité)</span>
+VITE_API_URL=https://mon-api.railway.app
+
+<span class="cm"># Utilisation dans le code Vue :</span>
+<span class="cm"># import.meta.env.VITE_API_URL</span></pre>
+    </div>
+
+    <div class="warn">
+      <strong>Seules les variables VITE_ sont exposées au navigateur</strong>
+      Vite inclut uniquement les variables préfixées <code>VITE_</code> dans le bundle. Ne mets jamais de secrets (clés privées, mots de passe DB) dans le <code>.env</code> du frontend — ils seraient visibles par tous.
+    </div>
+
+    <h3>Backend Express</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Variables backend — configurées sur la plateforme</span><span class="code-lang lang-bash">bash</span></div>
+      <pre><span class="cm"># .env LOCAL (ne jamais commiter)</span>
+PORT=3000
+JWT_SECRET=mon-secret-local-tres-long
+SUPABASE_URL=https://xxxxx.supabase.co
+SUPABASE_SERVICE_KEY=eyJh...
+FRONTEND_URL=http://localhost:5173
+
+<span class="cm"># En production (Railway, Render, etc.) :
+# Ces variables sont définies dans le dashboard de la plateforme
+# → Elles ne sont JAMAIS dans le code source</span>
+PORT=auto           <span class="cm"># Railway gère ça</span>
+JWT_SECRET=...      <span class="cm"># générer avec : openssl rand -base64 32</span>
+FRONTEND_URL=https://mon-app.vercel.app
+SUPABASE_URL=...    <span class="cm"># identique, Supabase est déjà en ligne</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">server.js — CORS dynamique</span><span class="code-lang lang-js">JS</span></div>
+      <pre><span class="cm">// Utiliser la variable d'env pour le CORS</span>
+app.<span class="cf">use</span>(<span class="cf">cors</span>({
+  origin: process.env.FRONTEND_URL || <span class="cs">'http://localhost:5173'</span>,
+  credentials: <span class="cs">true</span>
+}))</pre>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j13-ex')">← Exercices J13</button>
+    <button class="btn btn-primary" onclick="goto('j14-backend')">Déployer le backend →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ J14 BACKEND -->
+<section class="section" id="j14-backend">
+  <div class="day-header">
+    <div class="day-num">14</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-teal">Déploiement</span></div>
+      <div class="day-title">Déployer le backend</div>
+      <div class="day-sub">Railway · Render · Variables d'env en production</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Plateformes de déploiement</div>
+
+    <div class="deploy-grid">
+      <div class="deploy-card">
+        <div class="deploy-icon">🚂</div>
+        <div class="deploy-name">Railway</div>
+        <div class="deploy-desc">Déploiement depuis GitHub, variables d'env faciles, logs en temps réel.</div>
+        <span class="deploy-tag" style="background:var(--tag-gold);color:var(--tag-gold-t)">Recommandé</span>
+      </div>
+      <div class="deploy-card">
+        <div class="deploy-icon">⚙️</div>
+        <div class="deploy-name">Render</div>
+        <div class="deploy-desc">Gratuit (sleep après 15 min), bon pour les projets de portfolio.</div>
+        <span class="deploy-tag" style="background:var(--tag-teal);color:var(--tag-teal-t)">Gratuit</span>
+      </div>
+      <div class="deploy-card">
+        <div class="deploy-icon">▲</div>
+        <div class="deploy-name">Vercel</div>
+        <div class="deploy-desc">Fonctionne aussi pour Express via serverless functions.</div>
+        <span class="deploy-tag" style="background:var(--tag-purple);color:var(--tag-purple-t)">Avancé</span>
+      </div>
+    </div>
+
+    <h3>Déploiement sur Railway (recommandé)</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Préparer le repo</div>
+          <div class="step-desc">Vérifier que <code>.gitignore</code> contient <code>.env</code> et <code>node_modules/</code>. Pousser le backend sur GitHub.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Créer un projet Railway</div>
+          <div class="step-desc">railway.app → New Project → Deploy from GitHub → sélectionner le repo backend.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Configurer les variables d'env</div>
+          <div class="step-desc">Dans Railway → Variables : ajouter JWT_SECRET, SUPABASE_URL, SUPABASE_SERVICE_KEY, FRONTEND_URL. Railway gère PORT automatiquement.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Vérifier le déploiement</div>
+          <div class="step-desc">Copier l'URL générée (ex: <code>mon-api.railway.app</code>). Tester avec Thunder Client : <code>GET https://mon-api.railway.app/</code> → doit retourner <code>{ "message": "API en ligne 🚀" }</code></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Vérifications avant déploiement</div><span class="code-lang lang-bash">bash</span></div>
+      <pre><span class="cm"># 1. Le script start existe dans package.json</span>
+<span class="cs">"start"</span>: <span class="cs">"node server.js"</span>
+
+<span class="cm"># 2. PORT utilise process.env.PORT</span>
+<span class="ck">const</span> <span class="cn">PORT</span> = process.env.PORT || <span class="cs">3000</span>
+
+<span class="cm"># 3. Pas de chemin absolu vers des fichiers locaux</span>
+
+<span class="cm"># 4. SQLite : utiliser un chemin relatif ou Supabase à la place</span>
+<span class="cm"># (SQLite ne persiste pas bien sur Railway → préférer Supabase)</span></pre>
+    </div>
+
+    <div class="tip">
+      <strong>SQLite en production sur Railway</strong>
+      Railway remet à zéro le système de fichiers à chaque déploiement. Ton fichier <code>notes.db</code> sera perdu. Pour la production, soit utilise Supabase (recommandé), soit configure un volume persistant dans Railway.
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j14-env')">← Variables d'env</button>
+    <button class="btn btn-primary" onclick="goto('j14-frontend')">Déployer le frontend →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ J14 FRONTEND -->
+<section class="section" id="j14-frontend">
+  <div class="day-header">
+    <div class="day-num">14</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-teal">Déploiement</span></div>
+      <div class="day-title">Déployer le frontend Vue</div>
+      <div class="day-sub">Vercel · Build · URL de l'API en production</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Mettre Vue en ligne</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Build local pour tester</div>
+          <div class="step-desc"><code>npm run build</code> → dossier <code>dist/</code> créé. <code>npm run preview</code> pour le tester localement.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Déployer sur Vercel</div>
+          <div class="step-desc">vercel.com → New Project → importer le repo GitHub du frontend → Vercel détecte Vue/Vite automatiquement.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Configurer VITE_API_URL</div>
+          <div class="step-desc">Dans Vercel → Settings → Environment Variables : ajouter <code>VITE_API_URL</code> avec l'URL Railway de ton API.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Mettre à jour CORS côté backend</div>
+          <div class="step-desc">Dans Railway : mettre à jour <code>FRONTEND_URL</code> avec l'URL Vercel générée (ex: <code>https://mon-app.vercel.app</code>).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Configurer le routing Vue</div>
+          <div class="step-desc">Créer <code>vercel.json</code> à la racine du projet Vue pour que le router fonctionne.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">vercel.json — routing SPA</span><span class="code-lang lang-json">JSON</span></div>
+      <pre>{
+  <span class="cs">"rewrites"</span>: [
+    { <span class="cs">"source"</span>: <span class="cs">"/(.*)"</span>, <span class="cs">"destination"</span>: <span class="cs">"/index.html"</span> }
+  ]
+}</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Checklist finale avant de partager l'URL</span><span class="code-lang lang-bash">bash</span></div>
+      <pre>✓ GET https://mon-api.railway.app/  → { "message": "API en ligne 🚀" }
+✓ POST /api/auth/register          → crée un compte
+✓ POST /api/auth/login             → retourne un token
+✓ GET /api/notes (avec token)      → retourne les notes
+✓ Ouvrir https://mon-app.vercel.app
+✓ S'inscrire → créer une note → la voir dans la liste
+✓ Actualiser → les données persistent (vraie DB !)
+✓ Se déconnecter → accéder à /notes → redirigé vers /login
+✓ Ouvrir en navigation privée → tester depuis zéro</pre>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j14-backend')">← Backend</button>
+    <button class="btn btn-primary" onclick="goto('j14-debug')">Debugger →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ J14 DEBUG -->
+<section class="section" id="j14-debug">
+  <div class="day-header">
+    <div class="day-num">14</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-teal">Pratique</span></div>
+      <div class="day-title">Debugger en production</div>
+      <div class="day-sub">Les erreurs courantes et comment les résoudre</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Problèmes fréquents & solutions</div>
+
+    <div class="ex" style="border-left-color: var(--accent4);">
+      <div class="ex-head"><span class="ex-badge" style="background:var(--tag-red);color:var(--tag-red-t)">Erreur CORS</span><span class="ex-title">Access-Control-Allow-Origin manquant</span></div>
+      <p style="margin-bottom:8px"><strong style="color:var(--text)">Symptôme :</strong> La console Vue affiche <code>CORS error</code>, le réseau montre une requête bloquée.</p>
+      <p><strong style="color:var(--text)">Causes & solutions :</strong></p>
+      <ul>
+        <li>Le <code>FRONTEND_URL</code> dans Railway ne correspond pas exactement à l'URL Vercel (attention au slash final)</li>
+        <li>Tu as oublié <code>app.use(cors(...))</code> avant les routes dans server.js</li>
+        <li>Vérifier les logs Railway → est-ce que le serveur démarre sans erreur ?</li>
+      </ul>
+    </div>
+
+    <div class="ex" style="border-left-color: var(--accent4);">
+      <div class="ex-head"><span class="ex-badge" style="background:var(--tag-red);color:var(--tag-red-t)">Erreur 401</span><span class="ex-title">Token invalide ou manquant</span></div>
+      <p style="margin-bottom:8px"><strong style="color:var(--text)">Symptôme :</strong> Les requêtes API retournent 401 même après connexion.</p>
+      <ul>
+        <li>Ouvrir les DevTools → Application → localStorage → vérifier que <code>token</code> est présent</li>
+        <li>Dans useApi.js, vérifier que le header <code>Authorization: Bearer xxx</code> est bien envoyé (onglet Network)</li>
+        <li>Le <code>JWT_SECRET</code> en production est différent du local ? Reconnecter.</li>
+      </ul>
+    </div>
+
+    <div class="ex" style="border-left-color: var(--accent4);">
+      <div class="ex-head"><span class="ex-badge" style="background:var(--tag-red);color:var(--tag-red-t)">Page blanche</span><span class="ex-title">Build Vue qui ne fonctionne pas</span></div>
+      <ul>
+        <li>Ouvrir la console du navigateur → erreur JS visible ?</li>
+        <li>Vérifier que <code>VITE_API_URL</code> est configurée dans Vercel (pas seulement en local)</li>
+        <li>Vérifier <code>vercel.json</code> pour le routing SPA</li>
+        <li>Tenter un redéploiement forcé dans Vercel</li>
+      </ul>
+    </div>
+
+    <div class="ex" style="border-left-color: var(--accent4);">
+      <div class="ex-head"><span class="ex-badge" style="background:var(--tag-red);color:var(--tag-red-t)">Railway crash</span><span class="ex-title">Le backend ne démarre pas</span></div>
+      <ul>
+        <li>Consulter les logs dans Railway → message d'erreur exact</li>
+        <li>Vérifier que <code>package.json</code> a un script <code>"start"</code></li>
+        <li>Toutes les variables d'env sont configurées ? (JWT_SECRET, SUPABASE_URL…)</li>
+        <li>Tester <code>npm start</code> en local avec les mêmes variables</li>
+      </ul>
+    </div>
+
+    <h3>Outils de debug indispensables</h3>
+    <div class="code-wrap">
+      <div class="code-top"><span class="code-fname">Checklist debug</span><span class="code-lang lang-bash">bash</span></div>
+      <pre><span class="cm"># 1. DevTools → Console : erreurs JS</span>
+<span class="cm"># 2. DevTools → Network : voir les requêtes HTTP</span>
+<span class="cm">#    → Status code, headers, body de requête ET réponse</span>
+<span class="cm"># 3. DevTools → Application → localStorage : token présent ?</span>
+<span class="cm"># 4. Vue DevTools (extension) : état du store Pinia</span>
+<span class="cm"># 5. Railway Logs : logs du serveur en temps réel</span>
+<span class="cm"># 6. Thunder Client : tester l'API directement (sans Vue)</span>
+
+<span class="cm"># Ajouter des logs temporaires côté backend :</span>
+console.<span class="cf">log</span>(<span class="cs">'req.headers:'</span>, req.headers)
+console.<span class="cf">log</span>(<span class="cs">'req.body:'</span>, req.body)
+console.<span class="cf">log</span>(<span class="cs">'req.user:'</span>, req.user)</pre>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j14-frontend')">← Frontend</button>
+    <button class="btn btn-primary" onclick="goto('j14-ex')">Exercices J14 →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ J14 EX -->
+<section class="section" id="j14-ex">
+  <div class="day-header">
+    <div class="day-num">14</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-red">Pratique</span></div>
+      <div class="day-title">Exercices — Jour 14</div>
+      <div class="day-sub">Déployer les deux projets et avoir une URL publique</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Mise en ligne finale</div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 1</span><span class="ex-title">Déployer le backend</span><span class="ex-time">45 min</span></div>
+      <ul class="checklist">
+        <li>Vérifier : <code>.gitignore</code> contient <code>.env</code> et <code>node_modules</code></li>
+        <li>Vérifier : <code>package.json</code> a le script <code>"start"</code></li>
+        <li>Vérifier : <code>PORT = process.env.PORT || 3000</code></li>
+        <li>Créer un projet Railway depuis le repo GitHub du backend</li>
+        <li>Configurer les variables d'env dans Railway</li>
+        <li>Tester l'URL publique avec Thunder Client : tous les endpoints CRUD doivent fonctionner</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 2</span><span class="ex-title">Déployer le frontend</span><span class="ex-time">30 min</span></div>
+      <ul class="checklist">
+        <li>Créer <code>vercel.json</code> avec la règle de rewrite SPA</li>
+        <li>Créer un projet Vercel depuis le repo GitHub du frontend</li>
+        <li>Configurer <code>VITE_API_URL</code> dans les variables Vercel avec l'URL Railway</li>
+        <li>Mettre à jour <code>FRONTEND_URL</code> dans Railway avec l'URL Vercel</li>
+        <li>Redéployer les deux (Railway redéploie auto après changement de variable)</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Exercice 3 — Validation finale</span><span class="ex-title">Test complet de bout en bout</span><span class="ex-time">30 min</span></div>
+      <ul class="checklist">
+        <li>Ouvrir l'URL Vercel en navigation privée (zéro cache)</li>
+        <li>S'inscrire avec un vrai email</li>
+        <li>Créer 3 notes avec des catégories différentes</li>
+        <li>Modifier une note → vérifier que la modification est sauvegardée</li>
+        <li>Fermer l'onglet, rouvrir l'URL → les notes sont toujours là (vraie DB !)</li>
+        <li>Se déconnecter → essayer d'accéder à /notes → redirigé vers /login</li>
+        <li>Partager l'URL à quelqu'un → il peut créer son propre compte et ses propres notes</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="ex-badge">Bonus</span><span class="ex-title">Soigner le README</span><span class="ex-time">20 min</span></div>
+      <ul class="checklist">
+        <li>README du backend : description, variables d'env nécessaires, routes de l'API</li>
+        <li>README du frontend : description, lien vers le site déployé, lien vers l'API</li>
+        <li>Screenshot de l'app dans le README</li>
+        <li>Ajouter les deux repos dans ton profil GitHub</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j14-debug')">← Debug</button>
+    <button class="btn btn-primary" onclick="goto('j14-bilan')">🏆 Bilan final →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ J14 BILAN -->
+<section class="section" id="j14-bilan">
+  <div class="day-header">
+    <div class="day-num">🏆</div>
+    <div class="day-info">
+      <div class="tag-row"><span class="tag tag-gold">Bilan final</span><span class="tag tag-teal">14 jours</span></div>
+      <div class="day-title">Tu l'as fait.</div>
+      <div class="day-sub">De zéro à une app fullstack en production en 14 jours</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="celebrate">
+      <div class="celebrate-title">🎉 Félicitations !</div>
+      <p>Tu as construit une vraie application fullstack avec authentification, base de données persistante, et déployée en ligne. C'est ce que font les développeurs professionnels — et tu l'as fait en 14 jours de formation.</p>
+    </div>
+
+    <div class="block-label">Tout ce que tu maîtrises maintenant</div>
+
+    <div class="skill-group">
+      <div class="skill-group-title">Phase 1 — Fondations</div>
+      <div class="skill-list">
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent2)"></div>Terminal, VS Code, Git & GitHub</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent2)"></div>HTML5 sémantique, Flexbox, CSS Grid, responsive design</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent2)"></div>JavaScript ES6+ : destructuring, arrow functions, modules</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent2)"></div>async/await, fetch(), gestion d'erreurs</div>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <div class="skill-group-title">Phase 2 — Vue 3</div>
+      <div class="skill-list">
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent3)"></div>Composition API : ref(), reactive(), computed(), watch()</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent3)"></div>Composants SFC, props, emit, slots</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent3)"></div>Vue Router : routes, guards, paramètres dynamiques</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent3)"></div>Pinia : état global, actions, getters</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent3)"></div>Composables réutilisables (useFetch, useApi)</div>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <div class="skill-group-title">Phase 3 — Backend</div>
+      <div class="skill-list">
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent)"></div>Node.js + Express : serveur, routes, middleware</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent)"></div>API REST : CRUD, codes HTTP, validation</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent)"></div>SQL essentiel : SELECT, INSERT, UPDATE, DELETE, JOIN</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent)"></div>Supabase (PostgreSQL hébergé) ou SQLite local</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent)"></div>JWT, bcrypt, middleware d'authentification</div>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <div class="skill-group-title">Phase 4 — Assemblage & Déploiement</div>
+      <div class="skill-list">
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent4)"></div>Connecter Vue à une API REST avec auth JWT</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent4)"></div>Navigation guards pour protéger les pages</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent4)"></div>Variables d'environnement (local vs production)</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent4)"></div>Déploiement frontend sur Vercel</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent4)"></div>Déploiement backend sur Railway</div>
+        <div class="skill-item"><div class="skill-dot" style="background:var(--accent4)"></div>Debugger une app fullstack en production</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Et maintenant ? — La suite logique</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num" style="background:var(--tag-teal);color:var(--accent2);">→</div>
+        <div class="step-body">
+          <div class="step-title">TypeScript</div>
+          <div class="step-desc">Ajouter le typage statique à Vue et Express. Indispensable en entreprise. La courbe d'apprentissage est douce si tu maîtrises bien JS.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="background:var(--tag-teal);color:var(--accent2);">→</div>
+        <div class="step-body">
+          <div class="step-title">Tests automatisés</div>
+          <div class="step-desc">Vitest (tests unitaires Vue), Playwright (tests end-to-end). Un projet sans tests ne peut pas grandir sereinement.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="background:var(--tag-teal);color:var(--accent2);">→</div>
+        <div class="step-body">
+          <div class="step-title">Docker & CI/CD</div>
+          <div class="step-desc">Containeriser l'application, automatiser les déploiements avec GitHub Actions. La façon dont les équipes travaillent en 2025.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="background:var(--tag-teal);color:var(--accent2);">→</div>
+        <div class="step-body">
+          <div class="step-title">Construire un 2ème projet</div>
+          <div class="step-desc">Le meilleur apprentissage. Choisis un problème réel que tu veux résoudre et construis-le. Portfolio = preuves concrètes de compétences.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="success">
+      <strong>Ton livrable final</strong>
+      Une URL publique · Un repo GitHub propre avec README · CRUD complet avec auth · Données persistées en vraie DB · Code organisé et commenté · Deux projets distincts (frontend / backend)
+      <br><br>
+      C'est un vrai portfolio de développeur junior. Partage-le.
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn" onclick="goto('j14-ex')">← Exercices J14</button>
+    <button class="btn btn-primary" disabled>Formation terminée 🚀</button>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+const sections  = document.querySelectorAll('.section');
+const navBtns   = document.querySelectorAll('.nav-btn');
+const progFill  = document.getElementById('prog-fill');
+const progPct   = document.getElementById('prog-pct');
+
+const sectionIds = [
+  'j13-plan','j13-api-service','j13-auth-store','j13-guards','j13-crud','j13-ex',
+  'j14-env','j14-backend','j14-frontend','j14-debug','j14-ex','j14-bilan'
+];
+
+function goto(id) {
+  sections.forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+
+  navBtns.forEach(btn => {
+    const fn = btn.getAttribute('onclick') || '';
+    btn.classList.toggle('active', fn.includes(`'${id}'`));
+  });
+
+  const idx = sectionIds.indexOf(id);
+  if (idx >= 0) {
+    const pct = Math.round(((idx + 1) / sectionIds.length) * 100);
+    progFill.style.width = pct + '%';
+    progPct.textContent  = pct + '%';
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
